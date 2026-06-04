@@ -1,0 +1,1482 @@
+<!doctype html><script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Order Status",
+  "schemaVersion": 1,
+  "description": "DDS Daily Review v5.6 (2026-06-02). Dual-tab dashboard. TAB 1 Commercial Orders: 49 RED + 6 YELLOW + 42 GREEN (UNIS + Costco SPG/WG Pro, non-Cancelled). Target Corp grouped by middle # + Appt; Costco pickup arrival overlays Ship column. TAB 2 Samples Tracker: 181 orders (28 Master + 153 Outbound Sample Ripvan), 1:00 PM cutoff SLA, OTD YTD 62.3%. Interactivity preserved: clickable rows, drawer, inline editing, localStorage persistence, CSV/JSON export.",
+  "mcpTools": [
+    "mcp__9fb215c5-2d61-4fbf-a6b3-6c2a0c8714e9__search_files",
+    "mcp__9fb215c5-2d61-4fbf-a6b3-6c2a0c8714e9__read_file_content",
+    "mcp__9fb215c5-2d61-4fbf-a6b3-6c2a0c8714e9__download_file_content"
+  ],
+  "mcpServerNames": [
+    "Google Drive",
+    "Google Drive",
+    "Google Drive"
+  ]
+}
+</script>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>DDS Daily Review v5.8 &mdash; June 4, 2026</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 10px 14px 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #fafaf8; color: #1a1a1a; font-size: 12px; line-height: 1.35;
+}
+.header-bar { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 4px; }
+.header-left h1 { font-size: 17px; margin: 0 0 2px; font-weight: 600; }
+.header-left h1 .vtag { display: inline-block; background:#1a1a1a; color:white; font-size:10px; font-weight:700; padding:2px 6px; border-radius:3px; margin-left:6px; vertical-align: middle; letter-spacing:0.3px; }
+.sub { color: #666; font-size: 11px; margin-bottom: 8px; }
+.sub b { color: #1a1a1a; }
+.actions { display: flex; gap: 6px; flex-shrink: 0; }
+.btn { padding: 6px 10px; font-size: 11px; font-weight: 600; border-radius: 4px; border: 1px solid #d4cdb8; background: white; color: #333; cursor: pointer; white-space: nowrap; }
+.btn:hover { background: #f5f4f1; border-color: #b8af94; }
+.btn.primary { background: #1a1a1a; color: white; border-color: #1a1a1a; }
+.btn.primary:hover { background: #333; }
+.btn .ico { margin-right: 4px; }
+
+/* Tab navigation */
+.tab-nav {
+  display: flex;
+  gap: 2px;
+  margin: 8px 0 12px;
+  border-bottom: 2px solid #e0d6bf;
+  padding-bottom: 0;
+}
+.tab-btn {
+  padding: 8px 18px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-bottom: none;
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  border-radius: 4px 4px 0 0;
+  margin-bottom: -2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tab-btn:hover { color: #1a1a1a; background: #f5f4f1; }
+.tab-btn.active {
+  color: #1a1a1a;
+  background: white;
+  border-color: #e0d6bf;
+  border-bottom: 2px solid white;
+}
+.tab-btn .tab-badge {
+  display: inline-block;
+  padding: 1px 7px;
+  background: #f1ede0;
+  color: #555;
+  font-size: 10.5px;
+  font-weight: 700;
+  border-radius: 10px;
+}
+.tab-btn.active .tab-badge { background: #1a1a1a; color: white; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+.exec-alert {
+  background: linear-gradient(90deg, #e8f6ed 0%, #f4faf6 100%);
+  border: 1px solid #b8dfc6;
+  border-left: 4px solid #2f7a47;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin: 4px 0 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.exec-alert .ea-icon { font-size: 16px; color: #2f7a47; flex-shrink: 0; line-height: 1.1; }
+.exec-alert .ea-body { font-size: 11.5px; color: #1c5a30; }
+.exec-alert .ea-body b { color: #144524; }
+.exec-alert .ea-pos { display: inline-block; padding: 1px 6px; background: #d6efdf; border-radius: 3px; font-weight: 600; margin: 0 2px; font-size: 11px; color: #1c5a30; }
+
+.summary { display: flex; gap: 8px; margin: 4px 0 10px; }
+.sum-pill { flex: 1; padding: 6px 10px; border-radius: 5px; font-size: 12px; font-weight: 600; }
+.sum-pill .n { font-size: 18px; font-weight: 700; margin-right: 5px; }
+.sum-pill.r { background: #fbe1de; color: #a3271b; }
+.sum-pill.y { background: #fbf1d1; color: #8a6300; }
+.sum-pill.g { background: #e2f5e9; color: #1c7a3a; }
+
+.ry-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.section-h { font-size: 12.5px; font-weight: 700; padding: 5px 10px; border-radius: 3px 3px 0 0; display: flex; justify-content: space-between; align-items: center; }
+.section-h.r { background: #c0392b; color: white; }
+.section-h.y { background: #d97e2e; color: white; }
+.section-h.g { background: #2f7a47; color: white; }
+.section-h .n { background: rgba(255,255,255,0.25); padding: 1px 6px; border-radius: 8px; font-size: 11px; margin-left: 6px; }
+
+.tbl-wrap { background: white; border: 1px solid #e0d6bf; border-top: none; border-radius: 0 0 3px 3px; overflow-x: auto; max-height: 460px; overflow-y: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+th { text-align: left; padding: 4px 6px; background: #f5f4f1; font-weight: 600; color: #444; border-bottom: 1px solid #e8e6e0; white-space: nowrap; position: sticky; top: 0; z-index: 1; }
+td { padding: 3px 6px; border-bottom: 1px solid #f1efea; vertical-align: top; }
+td.col-comment { max-width: 240px; min-width: 130px; }
+td.col-status { white-space: nowrap; }
+tr.row-data { cursor: pointer; }
+tr.row-data:hover td { background: #faf9f5; }
+tr.row-data.active td { background: #fff7d6; }
+tr.row-master td { background: #fbf6e8; }
+tr.row-master.active td { background: #fff7d6; }
+tr.row-master td:first-child::before { content: "\25B8"; color: #b8a64f; margin-right: 4px; font-size: 9px; }
+tr:last-child td { border-bottom: none; }
+.empty { color: #bbb; }
+.dp { color: #c0392b; font-size: 10px; font-weight: 600; }
+.has-comment-icon { color: #8a6300; margin-right: 3px; font-weight: bold; }
+.edited { background: #fff3a8 !important; box-shadow: inset 0 0 0 1px #d6a829; }
+.edit-cell { cursor: cell; }
+.edit-cell:hover { outline: 1px dashed #b8af94; }
+.comment-preview { color: #444; font-size: 11px; }
+.comment-preview .empty { color: #c4c4c4; font-style: italic; }
+.paperclip-badge { display:inline-block; margin-right: 4px; padding: 0 5px; background:#e3edf7; color:#234868; border-radius:8px; font-size:10px; font-weight:600; }
+.status-chip { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; letter-spacing: 0.2px; white-space: nowrap; }
+.status-received { background: #e3edf7; color: #234868; }
+.status-picked   { background: #f3e6f7; color: #5a2768; }
+.status-planned  { background: #fef0d2; color: #7a5a18; }
+.status-open     { background: #f1f1f1; color: #555; }
+.status-intransit{ background: #d8ecf4; color: #144558; }
+.status-shipped  { background: #e2f5e9; color: #1c7a3a; }
+.status-delivered{ background: #d6efdf; color: #144524; }
+.status-cancelled{ background: #fbe1de; color: #a3271b; }
+.status-unknown  { background: #f1f1f1; color: #555; }
+.inline-input { font: inherit; width: 100%; min-width: 80px; border: 1px solid #d97e2e; border-radius: 2px; padding: 1px 3px; background: white; }
+textarea.inline-input { min-height: 48px; resize: vertical; }
+
+/* Samples SLA chip */
+.sla-chip {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.sla-chip.g { background: #d6efdf; color: #144524; }
+.sla-chip.r { background: #fbe1de; color: #a3271b; }
+.sla-cutoff-note {
+  background: #f5f1e4;
+  border: 1px solid #e0d6bf;
+  border-left: 3px solid #8a6b2e;
+  border-radius: 3px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: #5a4a18;
+  margin: 4px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sla-cutoff-note .sla-icon { font-size: 14px; color: #8a6b2e; }
+.sla-cutoff-note b { color: #3a3008; }
+
+/* OTD metric cards */
+.otd-bar { display: grid; grid-template-columns: 1.5fr 1.5fr 1fr 1fr; gap: 10px; margin: 8px 0 14px; }
+.otd-card {
+  background: white;
+  border: 1px solid #e0d6bf;
+  border-radius: 5px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.otd-card.big { background: linear-gradient(135deg, #f5fbf6 0%, #ffffff 60%); border-color: #c8e2d0; }
+.otd-card .otd-label { font-size: 10.5px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.4px; color: #888; }
+.otd-card.big .otd-label { color: #2f7a47; }
+.otd-card .otd-val { font-size: 24px; font-weight: 700; color: #1a1a1a; line-height: 1.1; margin-top: 2px; }
+.otd-card.big .otd-val { color: #1c5a30; }
+.otd-card .otd-val.low { color: #a3271b !important; }
+.otd-card .otd-val.mid { color: #8a6300 !important; }
+.otd-card .otd-sub { font-size: 10.5px; color: #888; }
+
+.note { color: #444; font-size: 10.5px; line-height: 1.55; margin-top: 10px; padding: 8px 12px; background: white; border: 1px solid #e0d6bf; border-radius: 3px; }
+.note b { color: #1a1a1a; }
+.note .nb { margin-top: 6px; padding-top: 6px; border-top: 1px solid #f0ebda; color: #666; }
+
+/* Drawer */
+.drawer-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.25); opacity: 0; pointer-events: none; transition: opacity 0.18s; z-index: 100; }
+.drawer-mask.open { opacity: 1; pointer-events: auto; }
+.drawer { position: fixed; top: 0; right: 0; height: 100vh; width: 480px; max-width: 92vw; background: white; box-shadow: -8px 0 24px rgba(0,0,0,0.18); transform: translateX(100%); transition: transform 0.22s ease; z-index: 101; display: flex; flex-direction: column; }
+.drawer.open { transform: translateX(0); }
+.drawer-h { padding: 12px 16px 10px; border-bottom: 1px solid #e8e6e0; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.drawer-h h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.drawer-h .meta { color: #666; font-size: 11px; margin-top: 3px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.drawer-close { background: transparent; border: none; font-size: 22px; line-height: 1; color: #888; cursor: pointer; padding: 0 4px; }
+.drawer-close:hover { color: #333; }
+.drawer-body { padding: 12px 16px; overflow-y: auto; flex: 1; }
+.dfield { margin-bottom: 12px; }
+.dfield .lbl { font-size: 10.5px; text-transform: uppercase; color: #888; font-weight: 600; letter-spacing: 0.3px; margin-bottom: 3px; }
+.dfield .val { font-size: 13px; color: #1a1a1a; }
+.dfield .val.empty { color: #bbb; }
+.drow { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.dchip { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.dchip.r { background: #fbe1de; color: #a3271b; }
+.dchip.y { background: #fbf1d1; color: #8a6300; }
+.dchip.g { background: #e2f5e9; color: #1c7a3a; }
+.master-banner { background:#fff8e0; border:1px solid #e8dfb8; color:#6b5a18; border-radius:3px; padding:6px 9px; font-size:11px; margin-bottom:10px; }
+.master-banner b { color:#4a3f0c; }
+.master-list { background: #fbf6e8; border: 1px solid #e8dfb8; border-radius: 3px; padding: 8px 10px; font-size: 11px; color: #5a4a18; max-height: 170px; overflow-y: auto; }
+.master-list .ml-row { padding: 2px 0; font-family: ui-monospace, Menlo, Consolas, monospace; }
+textarea#dCommentEl { width: 100%; min-height: 100px; border: 1px solid #d4cdb8; border-radius: 3px; padding: 7px 9px; font-family: inherit; font-size: 12px; resize: vertical; }
+textarea#dCommentEl:focus { outline: none; border-color: #d97e2e; box-shadow: 0 0 0 2px #fbe6cf; }
+.drawer-quick { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+.drawer-quick input { font: inherit; border: 1px solid #d4cdb8; border-radius: 3px; padding: 4px 6px; width: 100%; }
+.drawer-quick input:focus { outline: none; border-color: #d97e2e; }
+.drawer-quick label { display: block; font-size: 10px; color: #888; text-transform: uppercase; font-weight: 600; margin-bottom: 2px; letter-spacing: 0.3px; }
+.save-hint { color: #2f7a47; font-size: 11px; margin-top: 6px; height: 14px; }
+
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1a1a1a; color: white; padding: 9px 16px; border-radius: 4px; font-size: 12px; opacity: 0; transition: opacity 0.18s, transform 0.18s; z-index: 200; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 900px) {
+  .ry-row { grid-template-columns: 1fr; }
+  .header-bar { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<div class="header-bar">
+  <div class="header-left">
+    <h1>DDS Daily Review &mdash; June 4, 2026 <span class="vtag">v5.8</span></h1>
+    <div class="sub">Master Base: <b>2026 RV Order Tracker</b> &middot; Support Base: <b>Outbound-Inquiry-Expanding(202606041007)</b> (leading-zero PO match) &middot; Samples: <b>53 orders</b> &middot; Scope: <b>UNIS + Costco SPG/WG Pro, non-Cancelled</b></div>
+  </div>
+  <div class="actions">
+    <button class="btn" id="btnDownload"><span class="ico">&#x2193;</span>Download Changes (CSV)</button>
+    <button class="btn primary" id="btnCopyJson"><span class="ico">&#x2398;</span>Copy Updated JSON</button>
+  </div>
+</div>
+
+<!-- Tab Navigation -->
+<div class="tab-nav" role="tablist">
+  <button class="tab-btn active" id="tabBtnCommercial" data-tab="commercial" role="tab">
+    Commercial Orders <span class="tab-badge" id="tabBadgeCommercial">131</span>
+  </button>
+  <button class="tab-btn" id="tabBtnSamples" data-tab="samples" role="tab">
+    Samples Tracker <span class="tab-badge" id="tabBadgeSamples">53</span>
+  </button>
+</div>
+
+<!-- TAB 1: Commercial Orders -->
+<div class="tab-pane active" id="tab-commercial">
+
+<div class="exec-alert" id="execAlert" style="background: linear-gradient(90deg, #e8f6ed 0%, #f4faf6 100%); border-color:#b8dfc6; border-left-color:#2f7a47;">
+  <div class="ea-icon" style="color:#2f7a47;">&#9888;</div>
+  <div class="ea-body" style="color:#1c5a30;"><b style="color:#144524;">EXECUTIVE ALERTS &mdash; Past Due Resolutions (RED yesterday &rarr; Shipped/Delivered today):</b> <span style="margin-left:4px;"><span class="ea-pos">Dot Foods 577659-001 (RDD 2026-06-01 &rarr; Ship 2026-06-03, Delivered 2026-06-03)</span></span> RED: <b>45</b> &middot; YELLOW: <b>34</b> &middot; GREEN: <b>52</b>. <i>Note: 1 past-due PO cleared (577659-001 shipped &amp; delivered 6/3). New RED today: UNFI 074298191 (RDD 6/3, Col N empty). YELLOW jumped to 34 driven by new Target family 7435370 (28 POs, RDD 6/10, no Appt yet). Appt dates overlaid from Outbound (Col X) &mdash; leading-zero PO match.</i></div>
+</div>
+
+<div class="summary">
+  <div class="sum-pill r"><span class="n" id="cntRed">45</span> RED</div>
+  <div class="sum-pill y"><span class="n" id="cntYellow">34</span> YELLOW</div>
+  <div class="sum-pill g"><span class="n" id="cntGreen">52</span> GREEN</div>
+</div>
+
+<div class="ry-row">
+  <div>
+    <div class="section-h r">RED &mdash; RDD overdue, with or without Appt (no Ship) <span class="n" id="cntRedH">45</span></div>
+    <div class="tbl-wrap">
+      <table id="tblRed">
+        <thead><tr><th>PO #</th><th>Customer</th><th>DN</th><th>SF</th><th>RDD</th><th>Appt</th><th>Ship</th><th>Comments</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <div>
+    <div class="section-h y">YELLOW &mdash; RDD next 7d, no valid Appt (today/future) and not Shipped <span class="n" id="cntYellowH">34</span></div>
+    <div class="tbl-wrap">
+      <table id="tblYellow">
+        <thead><tr><th>PO #</th><th>Customer</th><th>DN</th><th>SF</th><th>RDD</th><th>Appt</th><th>Ship</th><th>Comments</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="section-h g">GREEN &mdash; RDD next 7d AND (Appt today/future OR Shipped OR Delivered) <span class="n" id="cntGreenH">52</span></div>
+<div class="tbl-wrap">
+  <table id="tblGreen">
+    <thead><tr><th>PO #</th><th>Customer</th><th>DN</th><th>SF</th><th>RDD</th><th>Appt</th><th>Ship</th><th>Comments</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div class="note">
+  <b>v5.8 update notes &mdash; June 4, 2026 (refresh from live sources).</b> Tabbed layout: Commercial Orders (this tab) and Samples Tracker. Click any row to open the side panel. Double-click <b>Appt</b>, <b>Ship</b>, or <b>Comments</b> cells to edit inline. Use header buttons to persist changes (CSV / JSON) before refresh.
+  <div class="nb"><b>Today's deltas (vs 6/3):</b> RED <b>45</b> (flat) &middot; YELLOW <b>34</b> (&uarr;30) &middot; GREEN <b>52</b> (&uarr;3). 1 prior-day RED PO cleared (Dot Foods 577659-001 shipped &amp; delivered 6/3). 1 new RED: UNFI 074298191 (RDD 6/3, Col N empty). YELLOW surge = new Target family 7435370 (28 POs, RDD 6/10, no Appt in Outbound yet).</div>
+  <div class="nb"><b>Comment persistence:</b> Operational comments entered yesterday are stored in browser localStorage keyed by PO #. They <b>carry over automatically</b> for any PO still in today's RED/YELLOW/GREEN view.</div>
+  <div class="nb"><b>Manual corrections (6/2):</b> Cleared Appt date on Target 7055232 family (Outbound has no Appt). Costco SPG 5840427375/376 moved to GREEN with Ship 6/1 (pickup completed). Cleared Appt date on Costco UNIS 9600521760 (no Appt in Outbound). iHerb Moreno Valley 4500246105 shipped 6/2 &mdash; moved to GREEN. Costco SPG 2620508209/210 updated to RDD 6/4 with Appt 6/4 &mdash; moved to GREEN. Comments preserved via localStorage by PO #.</div>
+  <div class="nb"><b>Sort order:</b> Tables are sorted alphabetically by Customer (then RDD, then PO) so each account's POs stay grouped together for the DDS walk-through.</div>
+  <div class="nb"><b>Target Corp grouping:</b> POs with same middle # + same Appt collapse into one Master row; POs without Appt also collapse into one Master row. Active groups today: <b>3568720</b> (9 POs, Appt 6/4, RDD 5/11 &mdash; RED, 24d past), <b>7055232</b> (4 POs without Appt, RDD 5/19 &mdash; RED, 16d past), <b>7072947</b> (26 POs Appt 6/1 + 1 PO no Appt, RDD 5/31 &mdash; RED, 4d past), <b>7435370</b> (28 POs without Appt, RDD 6/10 &mdash; YELLOW).</div>
+  <div class="nb"><b>RED non-Target today:</b> Akamai 10133 (RDD 5/18), UNFI 044875766 (RDD 5/18), McLane ME10136868-01 + MN10101597-01 (RDD 5/26), UNFI 074298191 (RDD 6/3). All "Received - Confirmed" with Col N strictly empty.</div>
+  <div class="nb"><b>Costco SPG / WG Pro:</b> Latest pickup file checked (<i>Order tracking (15)</i>, folder 1L6F17...) &mdash; rule applied: if RDD is not overdue AND Costco pickup file has a Pickup Date (col J) OR Pickup Arrival (col AG), the order is classified GREEN with the pickup arrival overlaid as the Ship date. Today: 8 Costco GREEN rows (10340520084, 13760414286, 2670414375, 760520033 shipped 5/27-5/29; 5840427375/376 shipped 6/1; 2620508209/210 RDD 6/4 with Appt 6/4); 1 UNIS Mira Loma 9600521760 YELLOW (RDD 6/9, no Appt in Outbound).</div>
+  <div class="nb"><b>Rules:</b> RED = RDD overdue AND not Shipped (con o sin Appt) &middot; YELLOW = RDD next 7d AND sin Appt válida (futura/hoy) AND no Shipped &middot; GREEN = RDD next 7d AND (Appt today/future OR Col N populated OR Col O populated). Appt date proviene de Outbound Col X (Appointment Time → date) y solo cuenta si es hoy o futuro. <b>Excluded:</b> Cancelled status, non-UNIS warehouses (except Target), Col M.</div>
+</div>
+
+</div>
+<!-- /Tab 1 -->
+
+<!-- TAB 2: Samples Tracker -->
+<div class="tab-pane" id="tab-samples">
+
+<div class="exec-alert" id="execAlertSamples" style="background: linear-gradient(90deg, #f0f4fb 0%, #f8fafd 100%); border-color:#bcd0e8; border-left-color:#3a6ca8;">
+  <div class="ea-icon" style="color:#3a6ca8;">&#128202;</div>
+  <div class="ea-body" style="color:#234868;">
+    <b style="color:#16335a;">SAMPLES SLA SUMMARY &mdash; refreshed 2026-06-04 (53 orders: Samples Master Col E + Outbound Col AP="Sample Ripvan"):</b>
+    <span id="samplesAlertBody" style="margin-left:4px;">Computing&hellip;</span>
+  </div>
+</div>
+
+<div class="sla-cutoff-note">
+  <span class="sla-icon">&#9202;</span>
+  <span><b>SLA Rule:</b> Orders created BEFORE 1:00 PM (Col AT in Outbound) must ship SAME DAY (Col AA = Col AS). Orders created AT/AFTER 1:00 PM must ship by NEXT calendar day (Col AA &le; Col AS + 1). <b>Two sources combined:</b> Samples Master (Col E #XXXXXX, joined by SO # / Col I) + Outbound rows where Col AP "Order Created By" = "Sample Ripvan" (DN-XXXXXXX, direct read).</span>
+</div>
+
+<div class="otd-bar">
+  <div class="otd-card big">
+    <div class="otd-label">OTD YTD</div>
+    <div class="otd-val" id="otdYtdVal">&mdash;</div>
+    <div class="otd-sub" id="otdYtdSub">on-time / shipped</div>
+  </div>
+  <div class="otd-card big">
+    <div class="otd-label">OTD MTD (June 2026)</div>
+    <div class="otd-val" id="otdMtdVal">&mdash;</div>
+    <div class="otd-sub" id="otdMtdSub">on-time / shipped</div>
+  </div>
+  <div class="otd-card">
+    <div class="otd-label">Pending Outbound</div>
+    <div class="otd-val" id="cntPendingTop">0</div>
+    <div class="otd-sub">not yet shipped</div>
+  </div>
+  <div class="otd-card">
+    <div class="otd-label">Shipped (incl. cancelled)</div>
+    <div class="otd-val" id="cntShippedTop">0</div>
+    <div class="otd-sub">resolved orders</div>
+  </div>
+</div>
+
+<div class="section-h y">PENDING OUTBOUND &mdash; not yet shipped <span class="n" id="cntPendingH">0</span></div>
+<div class="tbl-wrap">
+  <table id="tblSamplePending">
+    <thead><tr><th>Src</th><th>Order ID</th><th>Customer</th><th>Created</th><th>Time</th><th>Ship Date</th><th>Status</th><th>SLA</th><th>Comments</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div class="section-h g" style="margin-top:14px;">SHIPPED &mdash; all orders fulfilled or cancelled <span class="n" id="cntShippedH">0</span></div>
+<div class="tbl-wrap">
+  <table id="tblSampleShipped">
+    <thead><tr><th>Src</th><th>Order ID</th><th>Customer</th><th>Created</th><th>Time</th><th>Ship Date</th><th>Status</th><th>SLA</th><th>Comments</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div class="note">
+  <b>Samples Tracker logic &mdash; SLA evaluation.</b> The Samples Master spreadsheet (col E = Order Name like <code>#116314</code>) is joined to the Outbound file's SO # column (Col I, same <code>#XXXXXX</code> format).
+  <div class="nb"><b>Today's refresh (6/2 &mdash; verified Outbound join):</b> Samples unified across two sources: <b>Master</b> (28 unique orders from Samples Master Data Base tab, joined to Outbound by SO# regardless of Created By). <b>Outbound</b> (Sample Ripvan, 153 YTD 2026). Total 181: 12 PENDING, 169 SHIPPED. OTD YTD: <b>63.9%</b> (106 on-time / 166 shipped 2026 excluding cancelled &amp; legacy).</div>
+  <div class="nb"><b>Sources merged in this tab:</b> <b>Master</b> = Shopify-style sample orders from Samples Master Col C joined to Outbound Col I (SO #) — matched by SO #. <b>Outbound</b> = orders from Outbound where Col AP "Order Created By" = "Sample Ripvan" (DN-XXXXXXX format, direct read). Both filtered: 2025 entries removed, CANCELLED status removed. 1:00 PM SLA rule applies to both.</div>
+  <div class="nb"><b>Layout:</b> orders that have NOT yet shipped appear in the top section (Pending Outbound). Orders with a ship date OR Outbound status CANCELLED OR LEGACY appear in the bottom section (Shipped). The SLA column shows <b>Yes</b> (on time), <b>No (Xd late)</b>, <b>Cancelled</b>, or <b>N/A</b> (legacy).</div>
+  <div class="nb"><b>Status normalization (v4.6):</b> Outbound only tells us shipping (Col AA), not delivery. Any sample with a ship date is shown as <b>SHIPPED</b> regardless of whether Samples Master says "delivered". Only CANCELLED is preserved separately. <b>Time column:</b> shows Outbound Col AT (HH:MM) right after the created date so you can see the 1:00 PM SLA cutoff at a glance.</div>
+  <div class="nb"><b>Same-day SLA:</b> if Outbound Col AT (Create Time) &lt; 13:00, the order must ship the same day (Col AA = Col AS).</div>
+  <div class="nb"><b>Next-day SLA:</b> if Outbound Col AT &ge; 13:00, the order must ship by the next calendar day (Col AA &le; Col AS + 1 day).</div>
+  <div class="nb"><b>OTD metrics:</b> OTD YTD = on-time shipped / total shipped (cancelled excluded). OTD MTD = same metric restricted to samples created in the current month (Col AS month = May 2026).</div>
+  <div class="nb"><b>Legacy samples:</b> 6 pre-2026 samples (#112196 &ndash; #112485) have no Outbound match in the current snapshot but are marked <i>delivered</i> in the Samples sheet; they're shown in the Shipped section with SLA <b>N/A (legacy)</b> and excluded from OTD calculations.</div>
+  <div class="nb"><b>Interactivity:</b> rows are clickable (drawer opens with full sample detail). Double-click Comments to add operational notes &mdash; same persistence model as the Commercial tab (localStorage, keyed by Order Name).</div>
+</div>
+
+</div>
+<!-- /Tab 2 -->
+
+<!-- Drawer -->
+<div class="drawer-mask" id="drawerMask"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-h">
+    <div>
+      <h2 id="dPo">&mdash;</h2>
+      <div class="meta">
+        <span id="dStatus" class="dchip"></span>
+        <span id="dStatusG" class="status-chip"></span>
+        <span id="dCustomer"></span>
+      </div>
+    </div>
+    <button class="drawer-close" id="drawerClose" aria-label="Close">&times;</button>
+  </div>
+  <div class="drawer-body">
+    <div class="master-banner" id="dMasterBanner" style="display:none;">
+      <b>Master row:</b> Editing Appt or Ship here will apply to <b id="dMasterN"></b> member POs simultaneously. Comments are stored against the group.
+    </div>
+    <div class="drow">
+      <div class="dfield"><div class="lbl" id="dSfLbl">Ship From (Col I)</div><div class="val" id="dSf">&mdash;</div></div>
+      <div class="dfield"><div class="lbl" id="dRddLbl">RDD (Col E)</div><div class="val" id="dRdd">&mdash;</div></div>
+    </div>
+    <div class="dfield" id="dMasterWrap" style="display:none;">
+      <div class="lbl">Master PO Members</div>
+      <div class="master-list" id="dMasterList"></div>
+    </div>
+    <div class="drawer-quick" id="dQuickWrap">
+      <div><label id="dApptLbl">Appointment (Outbound Col X)</label><input type="text" id="dApptEl" placeholder="YYYY-MM-DD" /></div>
+      <div><label id="dShipLbl">Ship (Tracker Col N)</label><input type="text" id="dShipEl" placeholder="YYYY-MM-DD" /></div>
+    </div>
+    <div class="dfield" id="dSampleSlaWrap" style="display:none;">
+      <div class="lbl">SLA Evaluation</div>
+      <div class="val" id="dSampleSlaDetail">&mdash;</div>
+    </div>
+    <div class="dfield" style="margin-top:14px;">
+      <div class="lbl">Operational Comment</div>
+      <textarea id="dCommentEl" placeholder="Type live notes during DDS (carrier ETA, escalation owner, blockers, etc.)"></textarea>
+      <div class="save-hint" id="saveHint"></div>
+    </div>
+  </div>
+</aside>
+
+<div class="toast" id="toast">Copied</div>
+
+<script>
+/* =========================================================================
+   DATA - v5.8 (refreshed 2026-06-04 from live sources)
+   * Commercial: 2026 RV Order Tracker (UNIS + Costco SPG/WG Pro, non-Cancelled)
+   * Samples:    Samples Master sheet (Data Base tab) joined to Outbound (folder 1HcZCj...)
+   * Outbound today: Outbound-Inquiry-Expanding(202606030036)
+   * Outbound yesterday (for resolved past-dues): Outbound from 2026-06-02
+   * Costco SPG/WG Pro file: Order tracking (16), folder 1L6F17...
+   * Ship  = Tracker Col N (Actual Ship Date)
+   * Deliv = Tracker Col O (Actual Delivery Date)
+   * Status = Tracker Col G
+   * Col M is NOT used
+   * Target Corp POs grouped at render-time by middle # + effective Appt
+   * Comments stored in localStorage; carry over across refreshes by PO/Order Name
+   ========================================================================= */
+
+const DATA = {
+  red: [
+    {"po": "10133", "customer": "Akamai Pacific LLC", "status": "Received - Confirmed", "dn": "DN-2464349", "sf": "UNIS", "ship_to": "Carson", "rdd": "2026-05-18", "appt": "2026-06-02", "ship": "", "daysPast": 17},
+    {"po": "ME10136868-01", "customer": "McLane Company", "status": "Received - Confirmed", "dn": "DN-2477217", "sf": "UNIS", "ship_to": "Suneast", "rdd": "2026-05-26", "appt": "2026-06-01", "ship": "", "daysPast": 9},
+    {"po": "MN10101597-01", "customer": "McLane Company", "status": "Received - Confirmed", "dn": "DN-2540106", "sf": "UNIS", "ship_to": "Minnesota", "rdd": "2026-05-26", "appt": "", "ship": "", "daysPast": 9},
+    {"po": "0071-3568720-0589", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2451961", "sf": "UNIS", "ship_to": "Chambersburg", "rdd": "2026-05-11", "appt": "2026-06-04", "ship": "", "daysPast": 24},
+    {"po": "0071-3568720-0594", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2451959", "sf": "UNIS", "ship_to": "Lugoff", "rdd": "2026-05-11", "appt": "2026-06-04", "ship": "", "daysPast": 24},
+    {"po": "0071-3568720-3802", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2451958", "sf": "UNIS", "ship_to": "Amsterdam", "rdd": "2026-05-11", "appt": "2026-06-04", "ship": "", "daysPast": 24},
+    {"po": "0071-3568720-3804", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2451964", "sf": "UNIS", "ship_to": "West Jefferson", "rdd": "2026-05-11", "appt": "2026-06-04", "ship": "", "daysPast": 24},
+    {"po": "0071-3568720-3806", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2451962", "sf": "UNIS", "ship_to": "Rialto", "rdd": "2026-05-11", "appt": "2026-06-04", "ship": "", "daysPast": 24},
+    {"po": "0071-3568720-3856", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2451965", "sf": "UNIS", "ship_to": "Riverside", "rdd": "2026-05-11", "appt": "2026-06-04", "ship": "", "daysPast": 24},
+    {"po": "0071-3568720-3857", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2451966", "sf": "UNIS", "ship_to": "Logan Twp.", "rdd": "2026-05-11", "appt": "2026-06-04", "ship": "", "daysPast": 24},
+    {"po": "0071-3568720-3865", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2451957", "sf": "UNIS", "ship_to": "Chicago", "rdd": "2026-05-11", "appt": "2026-06-04", "ship": "", "daysPast": 24},
+    {"po": "0071-3568720-3868", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2451956", "sf": "UNIS", "ship_to": "Hampton", "rdd": "2026-05-11", "appt": "2026-06-04", "ship": "", "daysPast": 24},
+    {"po": "0071-7055232-0593", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2469245", "sf": "UNIS", "ship_to": "Shafter", "rdd": "2026-05-19", "appt": "", "ship": "", "daysPast": 16},
+    {"po": "0071-7055232-0594", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2469262", "sf": "UNIS", "ship_to": "Lugoff", "rdd": "2026-05-19", "appt": "", "ship": "", "daysPast": 16},
+    {"po": "0071-7055232-3802", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2469265", "sf": "UNIS", "ship_to": "Amsterdam", "rdd": "2026-05-19", "appt": "", "ship": "", "daysPast": 16},
+    {"po": "0071-7055232-3808", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2469256", "sf": "UNIS", "ship_to": "Midway", "rdd": "2026-05-19", "appt": "", "ship": "", "daysPast": 16},
+    {"po": "0071-7072947-0551", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486427", "sf": "UNIS", "ship_to": "Fridley", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-0553", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486424", "sf": "UNIS", "ship_to": "Fontana", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-0554", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486413", "sf": "UNIS", "ship_to": "Pueblo", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-0555", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486426", "sf": "UNIS", "ship_to": "Woodland", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-0556", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486425", "sf": "UNIS", "ship_to": "Tifton", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-0557", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486410", "sf": "UNIS", "ship_to": "Oconomowoc", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-0558", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486432", "sf": "UNIS", "ship_to": "Albany", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-0559", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486409", "sf": "UNIS", "ship_to": "Indianapolis", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-0560", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486428", "sf": "UNIS", "ship_to": "Stuarts Draft", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-0578", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486429", "sf": "UNIS", "ship_to": "Tyler", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-0579", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486411", "sf": "UNIS", "ship_to": "Wilton", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-0580", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486431", "sf": "UNIS", "ship_to": "Madison", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-0587", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486417", "sf": "UNIS", "ship_to": "Galesburg", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-0588", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486415", "sf": "UNIS", "ship_to": "Phoenix", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-0589", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486421", "sf": "UNIS", "ship_to": "Chambersburg", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-0590", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486419", "sf": "UNIS", "ship_to": "Cedar Falls", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-0593", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486414", "sf": "UNIS", "ship_to": "Shafter", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-0594", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486430", "sf": "UNIS", "ship_to": "Lugoff", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-3801", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486408", "sf": "UNIS", "ship_to": "Midlothian", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-3802", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486422", "sf": "UNIS", "ship_to": "Amsterdam", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-3804", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486416", "sf": "UNIS", "ship_to": "West Jefferson", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-3806", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486423", "sf": "UNIS", "ship_to": "Rialto", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-3808", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486412", "sf": "UNIS", "ship_to": "Midway", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-3811", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486418", "sf": "UNIS", "ship_to": "Newton", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-3856", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486434", "sf": "UNIS", "ship_to": "Riverside", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-3865", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486433", "sf": "UNIS", "ship_to": "Chicago", "rdd": "2026-05-31", "appt": "2026-06-01", "ship": "", "daysPast": 4},
+    {"po": "0071-7072947-3868", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2486420", "sf": "UNIS", "ship_to": "Hampton", "rdd": "2026-05-31", "appt": "", "ship": "", "daysPast": 4},
+    {"po": "044875766", "customer": "UNFI", "status": "Received - Confirmed", "dn": "DN-4014106", "sf": "UNIS", "ship_to": "Moreno Valley", "rdd": "2026-05-18", "appt": "", "ship": "", "daysPast": 17},
+    {"po": "074298191", "customer": "UNFI", "status": "Received - Confirmed", "dn": "DN-2497104", "sf": "UNIS", "ship_to": "Lancaster", "rdd": "2026-06-03", "appt": "2026-05-26", "ship": "", "daysPast": 1}
+  ],
+  yellow: [
+    {"po": "584326-001", "customer": "Dot Foods", "status": "Received - Confirmed", "dn": "DN-2541404", "sf": "UNIS", "ship_to": "Mt. Sterling", "rdd": "2026-06-08", "appt": "", "ship": ""},
+    {"po": "584327-001", "customer": "Dot Foods", "status": "Received - Confirmed", "dn": "DN-2541405", "sf": "UNIS", "ship_to": "University Park", "rdd": "2026-06-08", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0551", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536723", "sf": "UNIS", "ship_to": "Fridley", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0553", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536711", "sf": "UNIS", "ship_to": "Fontana", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0554", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536716", "sf": "UNIS", "ship_to": "Pueblo", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0555", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536724", "sf": "UNIS", "ship_to": "Woodland", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0556", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536721", "sf": "UNIS", "ship_to": "Tifton", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0557", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536717", "sf": "UNIS", "ship_to": "Oconomowoc", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0558", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536713", "sf": "UNIS", "ship_to": "Albany", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0559", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536700", "sf": "UNIS", "ship_to": "Indianapolis", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0560", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536704", "sf": "UNIS", "ship_to": "Stuarts Draft", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0578", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536697", "sf": "UNIS", "ship_to": "Tyler", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0579", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536710", "sf": "UNIS", "ship_to": "Wilton", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0580", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536702", "sf": "UNIS", "ship_to": "Madison", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0587", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536709", "sf": "UNIS", "ship_to": "Galesburg", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0588", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536722", "sf": "UNIS", "ship_to": "Phoenix", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0589", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536708", "sf": "UNIS", "ship_to": "Chambersburg", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0590", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536699", "sf": "UNIS", "ship_to": "Cedar Falls", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0593", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536714", "sf": "UNIS", "ship_to": "Shafter", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-0594", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536720", "sf": "UNIS", "ship_to": "Lugoff", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-3801", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536718", "sf": "UNIS", "ship_to": "Midlothian", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-3802", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536715", "sf": "UNIS", "ship_to": "Amsterdam", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-3803", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536703", "sf": "UNIS", "ship_to": "Topeka", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-3804", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536707", "sf": "UNIS", "ship_to": "West Jefferson", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-3806", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536712", "sf": "UNIS", "ship_to": "Rialto", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-3808", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536701", "sf": "UNIS", "ship_to": "Midway", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-3856", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536705", "sf": "UNIS", "ship_to": "Riverside", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-3857", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536706", "sf": "UNIS", "ship_to": "Logan Twp.", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-3865", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536719", "sf": "UNIS", "ship_to": "Chicago", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "0071-7435370-3868", "customer": "Target Corporation", "status": "Received - Confirmed", "dn": "DN-2536698", "sf": "UNIS", "ship_to": "Hampton", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "1256005", "customer": "UNFI", "status": "Received - Confirmed", "dn": "DN-2526170", "sf": "UNIS", "ship_to": "Greenwood", "rdd": "2026-06-04", "appt": "", "ship": ""},
+    {"po": "074299140", "customer": "UNFI", "status": "Received - Confirmed", "dn": "DN-2532069", "sf": "UNIS", "ship_to": "Lancaster", "rdd": "2026-06-10", "appt": "", "ship": ""},
+    {"po": "044878804", "customer": "UNFI", "status": "Received - Confirmed", "dn": "DN-2526195", "sf": "UNIS", "ship_to": "Moreno Valley", "rdd": "2026-06-11", "appt": "", "ship": ""},
+    {"po": "1266775", "customer": "UNFI", "status": "Received - Confirmed", "dn": "DN-2544434", "sf": "UNIS", "ship_to": "Greenwood", "rdd": "2026-06-11", "appt": "", "ship": ""}
+  ],
+  green: [
+    {"po": "849594", "customer": "Casey's", "status": "In Transit - On Time - IN FULL", "dn": "DN-2496826", "sf": "UNIS", "ship_to": "Terre Haute", "rdd": "2026-06-08", "appt": "2026-05-28", "ship": "2026-05-29"},
+    {"po": "850042", "customer": "Casey's", "status": "In Transit - On Time - IN FULL", "dn": "DN-2503945", "sf": "UNIS", "ship_to": "Joplin", "rdd": "2026-06-10", "appt": "2026-05-28", "ship": "2026-05-29"},
+    {"po": "0073423640", "customer": "Core-Mark", "status": "Delivered - In Full", "dn": "DN-2464317", "sf": "UNIS", "ship_to": "Hayward", "rdd": "2026-06-04", "appt": "", "ship": "2026-05-12"},
+    {"po": "0165380230", "customer": "Core-Mark", "status": "In Transit - On Time - IN FULL", "dn": "DN-2530026", "sf": "UNIS", "ship_to": "West Sacramento", "rdd": "2026-06-05", "appt": "", "ship": "2026-05-30"},
+    {"po": "1401400960", "customer": "Core-Mark", "status": "Delivered - In Full", "dn": "DN-2497396", "sf": "UNIS", "ship_to": "Tampa", "rdd": "2026-06-08", "appt": "", "ship": "2026-05-23"},
+    {"po": "1702218710", "customer": "Core-Mark", "status": "In Transit - On Time - IN FULL", "dn": "DN-2530038", "sf": "UNIS", "ship_to": "Plymouth", "rdd": "2026-06-09", "appt": "", "ship": "2026-05-31"},
+    {"po": "0444634370", "customer": "Core-Mark", "status": "Delivered - In Full", "dn": "DN-2497435", "sf": "UNIS", "ship_to": "Clackamas", "rdd": "2026-06-10", "appt": "", "ship": "2026-05-23"},
+    {"po": "2801612670", "customer": "Core-Mark", "status": "Delivered - In Full", "dn": "DN-2478252", "sf": "UNIS", "ship_to": "Sanford", "rdd": "2026-06-10", "appt": "2026-05-20", "ship": "2026-05-21"},
+    {"po": "2620508209", "customer": "Costco Corporate", "status": "In Transit - On Time - IN FULL", "dn": "", "sf": "SPG", "ship_to": "College Park - SE Region", "rdd": "2026-06-04", "appt": "", "ship": "2026-06-02"},
+    {"po": "2620508210", "customer": "Costco Corporate", "status": "In Transit - On Time - IN FULL", "dn": "", "sf": "SPG", "ship_to": "College Park - SE Region", "rdd": "2026-06-04", "appt": "", "ship": "2026-06-02"},
+    {"po": "5840427375", "customer": "Costco Corporate", "status": "In Transit - On Time - IN FULL", "dn": "", "sf": "SPG", "ship_to": "Salt Lake City - NW Region", "rdd": "2026-06-05", "appt": "", "ship": "2026-06-01"},
+    {"po": "5840427376", "customer": "Costco Corporate", "status": "In Transit - On Time - IN FULL", "dn": "", "sf": "SPG", "ship_to": "Salt Lake City - NW Region", "rdd": "2026-06-05", "appt": "", "ship": "2026-06-01"},
+    {"po": "9600521760", "customer": "Costco Corporate", "status": "Received - Confirmed", "dn": "DN-2521133", "sf": "UNIS", "ship_to": "Mira Loma - LA Region", "rdd": "2026-06-09", "appt": "2026-06-04", "ship": ""},
+    {"po": "698135", "customer": "Davidson Specialty Foods", "status": "In Transit - On Time - IN FULL", "dn": "DN-2503947", "sf": "UNIS", "ship_to": "Brattleboro", "rdd": "2026-06-11", "appt": "2026-05-28", "ship": "2026-05-29"},
+    {"po": "7RDUPUEGU6", "customer": "Faire Wholesale", "status": "Delivered - In Full", "dn": "DN-2497288", "sf": "UNIS", "ship_to": "Rockford", "rdd": "2026-06-05", "appt": "", "ship": "2026-05-23"},
+    {"po": "D7P9QG6PAF", "customer": "Faire Wholesale", "status": "Delivered - In Full", "dn": "DN-2497304", "sf": "UNIS", "ship_to": "Renton", "rdd": "2026-06-05", "appt": "", "ship": "2026-05-23"},
+    {"po": "M2HXSJ83N6", "customer": "Faire Wholesale", "status": "In Transit - On Time - IN FULL", "dn": "DN-2497395", "sf": "UNIS", "ship_to": "New York", "rdd": "2026-06-05", "appt": "", "ship": "2026-05-23"},
+    {"po": "VQCB3MB5S2", "customer": "Faire Wholesale", "status": "Delivered - In Full", "dn": "DN-2497302", "sf": "UNIS", "ship_to": "Niagra Falls", "rdd": "2026-06-05", "appt": "", "ship": "2026-05-23"},
+    {"po": "3Z68GTCTG7", "customer": "Faire Wholesale", "status": "Delivered - SHORT", "dn": "DN-2504444", "sf": "UNIS", "ship_to": "Rockford", "rdd": "2026-06-10", "appt": "", "ship": "2026-05-28"},
+    {"po": "1521276", "customer": "GSC Enterprises, Inc.", "status": "In Transit - On Time - IN FULL", "dn": "DN-2504134", "sf": "UNIS", "ship_to": "Sulphur Springs", "rdd": "2026-06-10", "appt": "2026-05-28", "ship": "2026-05-29"},
+    {"po": "4500248230", "customer": "iHerb Hebron Hub", "status": "Delivered - In Full", "dn": "DN-2478304", "sf": "UNIS", "ship_to": "Hebron", "rdd": "2026-06-11", "appt": "2026-06-03", "ship": "2026-06-04"},
+    {"po": "4500248229", "customer": "iHerb Moreno Valley", "status": "Delivered - In Full", "dn": "DN-2478420", "sf": "UNIS", "ship_to": "Moreno Valley", "rdd": "2026-06-11", "appt": "2026-06-02", "ship": "2026-06-02"},
+    {"po": "3677371", "customer": "KeHe Distributors", "status": "Delivered - In Full", "dn": "DN-4014113", "sf": "UNIS", "ship_to": "Ellettsville", "rdd": "2026-06-04", "appt": "2026-05-12", "ship": "2026-05-13"},
+    {"po": "3679067", "customer": "KeHe Distributors", "status": "Delivered - In Full", "dn": "DN-4014110", "sf": "UNIS", "ship_to": "Dallas", "rdd": "2026-06-04", "appt": "2026-05-12", "ship": "2026-05-13"},
+    {"po": "3679362", "customer": "KeHe Distributors", "status": "Delivered - In Full", "dn": "DN-4014112", "sf": "UNIS", "ship_to": "Goodyear", "rdd": "2026-06-04", "appt": "2026-05-12", "ship": "2026-05-13"},
+    {"po": "3682209", "customer": "KeHe Distributors", "status": "Received - Confirmed", "dn": "DN-2464316", "sf": "UNIS", "ship_to": "Ontario", "rdd": "2026-06-05", "appt": "2026-06-03", "ship": ""},
+    {"po": "3688434", "customer": "KeHe Distributors", "status": "Delivered - In Full", "dn": "DN-2497456", "sf": "UNIS", "ship_to": "Stockton", "rdd": "2026-06-10", "appt": "", "ship": "2026-05-23"},
+    {"po": "3689897", "customer": "KeHe Distributors", "status": "In Transit - On Time - SHORT", "dn": "DN-2477218", "sf": "UNIS", "ship_to": "Ellettsville", "rdd": "2026-06-11", "appt": "2026-06-01", "ship": "2026-06-02"},
+    {"po": "3690022", "customer": "KeHe Distributors", "status": "Delivered - In Full", "dn": "DN-2477219", "sf": "UNIS", "ship_to": "Dallas", "rdd": "2026-06-11", "appt": "2026-05-18", "ship": "2026-05-19"},
+    {"po": "PO-2051064", "customer": "Lewisco Holdings, LLC", "status": "Delivered - In Full", "dn": "DN-2477587", "sf": "UNIS", "ship_to": "New York", "rdd": "2026-06-04", "appt": "2026-05-29", "ship": "2026-05-30"},
+    {"po": "MZ10088698-02", "customer": "McLane Company", "status": "In Transit - On Time - IN FULL", "dn": "DN-2520840", "sf": "UNIS", "ship_to": "Fredericksburg", "rdd": "2026-06-05", "appt": "2026-05-29", "ship": "2026-05-30"},
+    {"po": "WJ00857677-01", "customer": "McLane Company", "status": "Received - Confirmed", "dn": "DN-2461666", "sf": "UNIS", "ship_to": "New Jersey", "rdd": "2026-06-08", "appt": "2026-06-04", "ship": ""},
+    {"po": "MD10090988-01", "customer": "McLane Company", "status": "In Transit - On Time - IN FULL", "dn": "DN-2529999", "sf": "UNIS", "ship_to": "Cottonwood", "rdd": "2026-06-09", "appt": "", "ship": "2026-05-31"},
+    {"po": "MO10101089-01", "customer": "McLane Company", "status": "In Transit - On Time - IN FULL", "dn": "DN-2529995", "sf": "UNIS", "ship_to": "Ozark", "rdd": "2026-06-09", "appt": "", "ship": "2026-05-31"},
+    {"po": "NW10093536-01", "customer": "McLane Company", "status": "In Transit - On Time - IN FULL", "dn": "DN-2529974", "sf": "UNIS", "ship_to": "Lakewood", "rdd": "2026-06-09", "appt": "", "ship": "2026-05-30"},
+    {"po": "SZ10084807-01", "customer": "McLane Company", "status": "In Transit - On Time - IN FULL", "dn": "DN-2529972", "sf": "UNIS", "ship_to": "Southern California", "rdd": "2026-06-09", "appt": "", "ship": "2026-05-30"},
+    {"po": "ME10137891-01", "customer": "McLane Company", "status": "Received - Confirmed", "dn": "DN-2530001", "sf": "UNIS", "ship_to": "Suneast", "rdd": "2026-06-10", "appt": "2026-06-02", "ship": ""},
+    {"po": "MZ10089588-01", "customer": "McLane Company", "status": "In Transit - On Time - IN FULL", "dn": "DN-2530045", "sf": "UNIS", "ship_to": "Fredericksburg", "rdd": "2026-06-10", "appt": "", "ship": "2026-05-31"},
+    {"po": "156791", "customer": "The FruitGuys", "status": "In Transit - On Time - IN FULL", "dn": "DN-2496825", "sf": "UNIS", "ship_to": "San Francisco", "rdd": "2026-06-05", "appt": "2026-05-28", "ship": "2026-05-29"},
+    {"po": "21825", "customer": "TheFeed.com", "status": "Delivered - In Full", "dn": "DN-2497325", "sf": "UNIS", "ship_to": "Broomfield", "rdd": "2026-06-04", "appt": "", "ship": "2026-05-23"},
+    {"po": "8804815", "customer": "Tropical Nut & Fruit", "status": "In Transit - On Time - IN FULL", "dn": "DN-2504136", "sf": "UNIS", "ship_to": "Charlotte", "rdd": "2026-06-10", "appt": "2026-05-28", "ship": "2026-05-29"},
+    {"po": "1256007", "customer": "UNFI", "status": "Delivered - In Full", "dn": "DN-2504447", "sf": "UNIS", "ship_to": "North Prescott", "rdd": "2026-06-04", "appt": "2026-06-01", "ship": "2026-06-02"},
+    {"po": "1256012", "customer": "UNFI", "status": "Delivered - In Full", "dn": "DN-2504255", "sf": "UNIS", "ship_to": "Joilet", "rdd": "2026-06-04", "appt": "2026-06-01", "ship": "2026-06-02"},
+    {"po": "1252930", "customer": "UNFI", "status": "Received - Confirmed", "dn": "DN-2501196", "sf": "UNIS", "ship_to": "York", "rdd": "2026-06-08", "appt": "2026-06-05", "ship": ""},
+    {"po": "054976445", "customer": "UNFI", "status": "Delivered - In Full", "dn": "DN-2501133", "sf": "UNIS", "ship_to": "Aurora", "rdd": "2026-06-09", "appt": "2026-06-01", "ship": "2026-06-02"},
+    {"po": "084093481", "customer": "UNFI", "status": "Delivered - In Full", "dn": "DN-2501131", "sf": "UNIS", "ship_to": "Gilroy", "rdd": "2026-06-10", "appt": "2026-06-01", "ship": "2026-06-02"},
+    {"po": "1256015", "customer": "UNFI", "status": "Delivered - In Full", "dn": "DN-2504137", "sf": "UNIS", "ship_to": "Richburg", "rdd": "2026-06-10", "appt": "2026-06-01", "ship": "2026-06-02"},
+    {"po": "014547285", "customer": "UNFI", "status": "Delivered - In Full", "dn": "DN-2501134", "sf": "UNIS", "ship_to": "Rocklin", "rdd": "2026-06-11", "appt": "2026-06-01", "ship": "2026-06-02"},
+    {"po": "065066769", "customer": "UNFI", "status": "Delivered - In Full", "dn": "DN-2501132", "sf": "UNIS", "ship_to": "Ridgefield", "rdd": "2026-06-11", "appt": "2026-06-01", "ship": "2026-06-02"},
+    {"po": "1266770", "customer": "UNFI", "status": "Received - Confirmed", "dn": "DN-2541642", "sf": "UNIS", "ship_to": "Joilet", "rdd": "2026-06-11", "appt": "2026-06-08", "ship": ""},
+    {"po": "88648338", "customer": "Vistar", "status": "Delivered - In Full", "dn": "DN-2473751", "sf": "UNIS", "ship_to": "Livermore", "rdd": "2026-06-05", "appt": "2026-05-18", "ship": "2026-05-19"},
+    {"po": "2026-0034", "customer": "Wine Country Connect", "status": "Received - Confirmed", "dn": "DN-2526252", "sf": "UNIS", "ship_to": "Sonoma", "rdd": "2026-06-11", "appt": "2026-06-04", "ship": ""}
+  ]
+};
+
+
+/* =========================================================================
+   SAMPLES TRACKER DATA - 53 orders (unified, refreshed 2026-06-04):
+   - Master orders from Samples Master Data Base tab (#XXXXXX) joined to Outbound by SO# / Col I (any Created By)
+   - Outbound rows where Col AP 'Order Created By' = 'Sample Ripvan' (DN-XXXXXXX)
+   Status column = Outbound Col D verbatim. SLA reads Cols AS/AT/AA.
+   ========================================================================= */
+const SAMPLES_DATA = [
+    {"orderName": "#117107", "created": "2026-06-02", "createTime": "16:54", "shipDate": "2026-06-03", "customer": "Jon Collins", "shipName": "Jon Collins", "shipCity": "Atlanta, Georgia", "status": "SHIPPED", "qty": 8, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "Yes"},
+    {"orderName": "#117104", "created": "2026-06-02", "createTime": "15:22", "shipDate": "2026-06-03", "customer": "Jennifer Dyar", "shipName": "Jennifer Dyar", "shipCity": "Burleson, Texas", "status": "SHIPPED", "qty": 1, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "Yes"},
+    {"orderName": "#117103", "created": "2026-06-02", "createTime": "15:02", "shipDate": "2026-06-03", "customer": "Brian Field", "shipName": "Brian Field", "shipCity": "Seattle, Washington", "status": "SHIPPED", "qty": 1, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "Yes"},
+    {"orderName": "#117096", "created": "2026-06-02", "createTime": "13:23", "shipDate": "2026-06-03", "customer": "Kevin Jordan", "shipName": "Kevin Jordan", "shipCity": "Prospect, Kentucky", "status": "SHIPPED", "qty": 3, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "Yes"},
+    {"orderName": "DN-2539058", "created": "2026-06-01", "createTime": "20:13", "shipDate": "2026-06-02", "customer": "RIP VAN, INC.", "shipName": "RipVan - NY Office", "shipCity": "New York, NY", "status": "SHIPPED", "qty": 18, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2538731", "created": "2026-06-01", "createTime": "17:47", "shipDate": "2026-06-02", "customer": "RIP VAN, INC.", "shipName": "Sherry Hoffman,", "shipCity": "Hatfield, PA", "status": "SHIPPED", "qty": 4, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2538730", "created": "2026-06-01", "createTime": "17:44", "shipDate": "2026-06-02", "customer": "RIP VAN, INC.", "shipName": "Attn: Travis Horton", "shipCity": "Carlisle, PA", "status": "SHIPPED", "qty": 4, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2538723", "created": "2026-06-01", "createTime": "17:41", "shipDate": "2026-06-02", "customer": "RIP VAN, INC.", "shipName": "Christina Miller", "shipCity": "Sacramento, CA", "status": "SHIPPED", "qty": 3, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2538718", "created": "2026-06-01", "createTime": "17:34", "shipDate": "2026-06-02", "customer": "RIP VAN, INC.", "shipName": "Mayra Gonzalez Cortez", "shipCity": "San Pablo, CA", "status": "SHIPPED", "qty": 4, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2538713", "created": "2026-06-01", "createTime": "17:32", "shipDate": "", "customer": "RIP VAN, INC.", "shipName": "Paul Calhoun", "shipCity": "Santa Cruz, CA", "status": "PENDING", "qty": 0, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "COMMIT_FAILED", "source": "Outbound", "sla": "Pending"},
+    {"orderName": "#117036", "created": "2026-05-31", "createTime": "13:02", "shipDate": "2026-06-01", "customer": "Lisa Sher", "shipName": "Lisa Sher", "shipCity": "Bend, Oregon", "status": "SHIPPED", "qty": 7, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "Yes"},
+    {"orderName": "#116983", "created": "2026-05-29", "createTime": "13:22", "shipDate": "2026-06-01", "customer": "Emily Gutierrez", "shipName": "Emily Gutierrez", "shipCity": "604, new york", "status": "SHIPPED", "qty": 1, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "No (2d late)"},
+    {"orderName": "#116962", "created": "2026-05-28", "createTime": "20:22", "shipDate": "2026-05-29", "customer": "Hamed Eskandari", "shipName": "Hamed Eskandari", "shipCity": "Vernon, California", "status": "SHIPPED", "qty": 7, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "Yes"},
+    {"orderName": "DN-2529414", "created": "2026-05-28", "createTime": "16:18", "shipDate": "2026-06-02", "customer": "RIP VAN, INC.", "shipName": "RipVan - NY Office", "shipCity": "New York, NY", "status": "SHIPPED", "qty": 17, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "No (4d late)"},
+    {"orderName": "DN-2529345", "created": "2026-05-28", "createTime": "15:50", "shipDate": "", "customer": "RIP VAN, INC.", "shipName": "RipVan - NY Office", "shipCity": "New York, NY", "status": "PENDING", "qty": 0, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "COMMIT_FAILED", "source": "Outbound", "sla": "Pending"},
+    {"orderName": "DN-2528848", "created": "2026-05-28", "createTime": "12:22", "shipDate": "2026-05-29", "customer": "RIP VAN, INC.", "shipName": "RipVan - NY Office", "shipCity": "New York, NY", "status": "SHIPPED", "qty": 12, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "No (1d late)"},
+    {"orderName": "DN-2528833", "created": "2026-05-28", "createTime": "12:08", "shipDate": "2026-05-28", "customer": "RIP VAN, INC.", "shipName": "RipVan - NY Office", "shipCity": "New York, NY", "status": "SHIPPED", "qty": 16, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2528824", "created": "2026-05-28", "createTime": "12:06", "shipDate": "2026-05-28", "customer": "RIP VAN, INC.", "shipName": "RipVan - NY Office", "shipCity": "New York, NY", "status": "SHIPPED", "qty": 19, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2528817", "created": "2026-05-28", "createTime": "12:03", "shipDate": "2026-05-29", "customer": "RIP VAN, INC.", "shipName": "Alcyon Wealth Partners", "shipCity": "Youngstown,, OH", "status": "SHIPPED", "qty": 6, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "No (1d late)"},
+    {"orderName": "DN-2528742", "created": "2026-05-28", "createTime": "11:35", "shipDate": "2026-05-28", "customer": "RIP VAN, INC.", "shipName": "Attn: Lynda Berrios/Nicolette DeAngelis", "shipCity": "Austin, TX", "status": "SHIPPED", "qty": 1, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "#116950", "created": "2026-05-28", "createTime": "11:22", "shipDate": "2026-06-02", "customer": "Kevin Jordan", "shipName": "Ben Rayfield", "shipCity": "Jacksonville, Florida", "status": "SHIPPED", "qty": 6, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "No (5d late)"},
+    {"orderName": "#116949", "created": "2026-05-28", "createTime": "10:52", "shipDate": "2026-06-02", "customer": "Kevin Jordan", "shipName": "Barbara Cook", "shipCity": "Andalusia, Alabama", "status": "SHIPPED", "qty": 12, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "No (5d late)"},
+    {"orderName": "DN-2528505", "created": "2026-05-28", "createTime": "10:40", "shipDate": "2026-05-28", "customer": "RIP VAN, INC.", "shipName": "Lauren Haen  c/o Walgreens", "shipCity": "Deerfield, IL", "status": "SHIPPED", "qty": 9, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2528472", "created": "2026-05-28", "createTime": "10:28", "shipDate": "2026-05-29", "customer": "RIP VAN, INC.", "shipName": "Scott Carr", "shipCity": "POUGHKEEPSIE, NY", "status": "SHIPPED", "qty": 3, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "No (1d late)"},
+    {"orderName": "#116948", "created": "2026-05-28", "createTime": "", "shipDate": "", "customer": "Kevin Jordan", "shipName": "", "shipCity": "", "status": "PENDING", "qty": 4, "salesRep": "Samples Master", "outboundStatus": "PENDING", "source": "Master", "sla": "Pending"},
+    {"orderName": "DN-2525173", "created": "2026-05-27", "createTime": "11:21", "shipDate": "2026-05-28", "customer": "RIP VAN, INC.", "shipName": "Vistar West Region Buyers Show 2026 / Rip Van Inc.", "shipCity": "Gardena, CA", "status": "SHIPPED", "qty": 21, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "No (1d late)"},
+    {"orderName": "DN-2521394", "created": "2026-05-26", "createTime": "15:22", "shipDate": "2026-05-27", "customer": "RIP VAN, INC.", "shipName": "Scott Carr", "shipCity": "POUGHKEEPSIE, NY", "status": "SHIPPED", "qty": 2, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2519752", "created": "2026-05-26", "createTime": "09:49", "shipDate": "2026-05-26", "customer": "RIP VAN, INC.", "shipName": "Attn Joe Hamza", "shipCity": "Worcester,, MA", "status": "SHIPPED", "qty": 12, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2497610", "created": "2026-05-20", "createTime": "19:26", "shipDate": "2026-05-21", "customer": "RIP VAN, INC.", "shipName": "Mason Price", "shipCity": "Duluth, GA", "status": "SHIPPED", "qty": 4, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2495412", "created": "2026-05-20", "createTime": "09:42", "shipDate": "2026-05-20", "customer": "RIP VAN, INC.", "shipName": "Spike Rogers", "shipCity": "Dallas, TX", "status": "SHIPPED", "qty": 1, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2495272", "created": "2026-05-20", "createTime": "09:09", "shipDate": "2026-05-20", "customer": "RIP VAN, INC.", "shipName": "Christina Cangelosi", "shipCity": "Montclair, NJ", "status": "SHIPPED", "qty": 21, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2487747", "created": "2026-05-18", "createTime": "13:26", "shipDate": "2026-05-19", "customer": "RIP VAN, INC.", "shipName": "RipVan - NY Office", "shipCity": "New York, NY", "status": "SHIPPED", "qty": 7, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2487611", "created": "2026-05-18", "createTime": "12:34", "shipDate": "2026-05-18", "customer": "RIP VAN, INC.", "shipName": "Tanner Stevens", "shipCity": "Huntington Beach, CA", "status": "SHIPPED", "qty": 3, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2487607", "created": "2026-05-18", "createTime": "12:32", "shipDate": "2026-05-18", "customer": "RIP VAN, INC.", "shipName": "Antares V", "shipCity": "Los Angeles,, CA", "status": "SHIPPED", "qty": 4, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2487578", "created": "2026-05-18", "createTime": "12:27", "shipDate": "2026-05-18", "customer": "RIP VAN, INC.", "shipName": "Gino Rizzi", "shipCity": "Houston, TX", "status": "SHIPPED", "qty": 6, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2477576", "created": "2026-05-14", "createTime": "10:33", "shipDate": "2026-05-19", "customer": "RIP VAN, INC.", "shipName": "Love's Travel Stops", "shipCity": "Oklahoma City, OK", "status": "SHIPPED", "qty": 6, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "No (5d late)"},
+    {"orderName": "DN-2477563", "created": "2026-05-14", "createTime": "10:31", "shipDate": "2026-05-19", "customer": "RIP VAN, INC.", "shipName": "ATTN: Bryen Bloomfield", "shipCity": "Oklahoma City,, OK", "status": "SHIPPED", "qty": 6, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "No (5d late)"},
+    {"orderName": "DN-2477529", "created": "2026-05-14", "createTime": "10:21", "shipDate": "2026-05-14", "customer": "RIP VAN, INC.", "shipName": "RipVan - NY Office", "shipCity": "New York, NY", "status": "SHIPPED", "qty": 8, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "#116518", "created": "2026-05-13", "createTime": "19:00", "shipDate": "2026-05-14", "customer": "Lori Osborne", "shipName": "Lori Osborne", "shipCity": "Andover, Massachusetts", "status": "SHIPPED", "qty": 1, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "Yes"},
+    {"orderName": "DN-2474901", "created": "2026-05-13", "createTime": "10:05", "shipDate": "2026-05-13", "customer": "RIP VAN, INC.", "shipName": "Steve Williams - Canteen", "shipCity": "Fremont, CA", "status": "SHIPPED", "qty": 4, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "#116108", "created": "2026-05-12", "createTime": "13:10", "shipDate": "2026-05-12", "customer": "Kevin Jordan", "shipName": "Chris Stevenson", "shipCity": "Oklahoma City, Oklahoma", "status": "SHIPPED", "qty": 7, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "Yes"},
+    {"orderName": "#116107", "created": "2026-05-12", "createTime": "13:10", "shipDate": "2026-05-12", "customer": "Mandie Hoidas", "shipName": "Mandie Hoidas", "shipCity": "Oswego, Illinois", "status": "SHIPPED", "qty": 6, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "Yes"},
+    {"orderName": "#116106", "created": "2026-05-12", "createTime": "13:10", "shipDate": "2026-05-12", "customer": "Holly Padilla", "shipName": "Holly Padilla", "shipCity": "Elverta, California", "status": "SHIPPED", "qty": 7, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "Yes"},
+    {"orderName": "#116204", "created": "2026-05-11", "createTime": "16:10", "shipDate": "2026-05-12", "customer": "Kevin Jordan", "shipName": "Olga Castillo - Andrew De La Torre", "shipCity": "Doral, Florida", "status": "SHIPPED", "qty": 12, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "Yes"},
+    {"orderName": "#116201", "created": "2026-05-11", "createTime": "16:10", "shipDate": "2026-05-12", "customer": "Chris Follina", "shipName": "Chris Follina", "shipCity": "Suite 12, Columbus", "status": "SHIPPED", "qty": 17, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "Yes"},
+    {"orderName": "#116109", "created": "2026-05-11", "createTime": "16:10", "shipDate": "2026-05-12", "customer": "Kevin Jordan", "shipName": "Katy Thomas", "shipCity": "Scottsdale, Arizona", "status": "SHIPPED", "qty": 7, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "Yes"},
+    {"orderName": "#116314", "created": "2026-05-11", "createTime": "16:10", "shipDate": "2026-05-12", "customer": "Kevin Jordan", "shipName": "Nick Lepper", "shipCity": "Suite 5, Springfield", "status": "SHIPPED", "qty": 9, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "Yes"},
+    {"orderName": "#116281", "created": "2026-05-11", "createTime": "16:10", "shipDate": "2026-05-12", "customer": "Henry Mouradian", "shipName": "Henry Mouradian", "shipCity": "#8, Sun Valley", "status": "SHIPPED", "qty": 10, "salesRep": "Samples Master", "outboundStatus": "SHIPPED", "source": "Master", "sla": "Yes"},
+    {"orderName": "DN-2469904", "created": "2026-05-11", "createTime": "10:35", "shipDate": "2026-05-11", "customer": "RIP VAN, INC.", "shipName": "Sylvia O’Brien", "shipCity": "Minneapolis, MN", "status": "SHIPPED", "qty": 70, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2460852", "created": "2026-05-07", "createTime": "09:30", "shipDate": "2026-05-07", "customer": "RIP VAN, INC.", "shipName": "Syndigo - case 02617453", "shipCity": "Peoria, IL", "status": "SHIPPED", "qty": 6, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2460833", "created": "2026-05-07", "createTime": "09:21", "shipDate": "2026-05-07", "customer": "RIP VAN, INC.", "shipName": "Alyssa Schoeder", "shipCity": "Dublin, OH", "status": "SHIPPED", "qty": 6, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2460829", "created": "2026-05-07", "createTime": "09:18", "shipDate": "2026-05-07", "customer": "RIP VAN, INC.", "shipName": "Keegan Ensing", "shipCity": "Holland, MI", "status": "SHIPPED", "qty": 5, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"},
+    {"orderName": "DN-2458589", "created": "2026-05-06", "createTime": "11:10", "shipDate": "2026-05-06", "customer": "RIP VAN, INC.", "shipName": "RipVan - NY Office", "shipCity": "New York, NY", "status": "SHIPPED", "qty": 44, "salesRep": "Sample Ripvan (Outbound)", "outboundStatus": "SHIPPED", "source": "Outbound", "sla": "Yes"}
+];
+
+
+/* =========================================================================
+   STATE & PERSISTENCE
+   ========================================================================= */
+let EDITS = loadLS('os_edits_v1', {});
+let MASTER_EDITS = loadLS('os_master_edits_v1', {});
+let SAMPLE_EDITS = loadLS('os_sample_edits_v1', {});
+let activePo = null;
+let activeStatus = null;
+let activeTab = 'commercial';
+let displayCache = { red: [], yellow: [], green: [] };
+let sampleCache = { pending: [], shipped: [] };
+
+function loadLS(key, dflt) { try { return JSON.parse(localStorage.getItem(key) || 'null') || dflt; } catch (e) { return dflt; } }
+function saveLS(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) {} }
+function persist() {
+  saveLS('os_edits_v1', EDITS);
+  saveLS('os_master_edits_v1', MASTER_EDITS);
+  saveLS('os_sample_edits_v1', SAMPLE_EDITS);
+}
+
+function emptyCell(v) { return (v === undefined || v === null || v === "") ? '<span class="empty">&mdash;</span>' : escapeHtml(v); }
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
+function truncate(s, n) { s = String(s || ""); return s.length > n ? s.slice(0, n - 1) + "…" : s; }
+
+function isTargetCorpPO(r) {
+  return r.customer === "Target Corporation" && /^0071-\d+-\d+$/.test(r.po);
+}
+function targetMiddle(poStr) {
+  const m = poStr.match(/^0071-(\d+)-/);
+  return m ? m[1] : null;
+}
+function effective(row, field) {
+  const e = EDITS[row.po];
+  return (e && e[field] !== undefined) ? e[field] : (row[field] || "");
+}
+
+function buildDisplayRows(rows) {
+  // ----- Target Corp grouping: by middle # + Appt (existing behavior) -----
+  const targetRows = rows.filter(isTargetCorpPO);
+  const nonTarget  = rows.filter(r => !isTargetCorpPO(r));
+
+  const targetGroups = {};
+  for (const r of targetRows) {
+    const middle = targetMiddle(r.po);
+    const appt   = effective(r, "appt") || "";
+    const key    = middle + "|" + (appt || "__NOAPPT__");
+    if (!targetGroups[key]) targetGroups[key] = { middle, appt, members: [], proto: r };
+    targetGroups[key].members.push(r);
+  }
+
+  const out = [];
+  for (const k of Object.keys(targetGroups)) {
+    const g = targetGroups[k];
+    if (g.members.length === 1) { out.push(g.members[0]); continue; }
+    const shipSet = new Set(g.members.map(m => effective(m, "ship") || ""));
+    const masterShip = shipSet.size === 1 ? [...shipSet][0] : "";
+    const apptLabel = g.appt ? (", " + g.appt) : "";
+    out.push({
+      po: g.middle + " (" + g.members.length + " POs" + apptLabel + ")",
+      isMaster: true,
+      masterMiddle: g.middle,
+      members: g.members.map(m => m.po),
+      memberRows: g.members,
+      customer: g.proto.customer,
+      status: g.proto.status,
+      dn: "",
+      sf: g.proto.sf,
+      rdd: g.proto.rdd,
+      appt: g.appt,
+      ship: masterShip,
+      daysPast: g.proto.daysPast,
+      _hasAppt: !!g.appt
+    });
+  }
+
+  // ----- Non-Target grouping: by Customer + RDD + Appt + Comment -----
+  // Two rows merge into one Master row only when ALL four match
+  // (a missing comment ("") matches another missing comment).
+  // POs that must always render on their own line (never grouped) — e.g. small-parcel shipments
+  const NOGROUP = new Set(["MN10101597-01"]);
+  const otherGroups = {};
+  for (const r of nonTarget) {
+    if (NOGROUP.has(r.po)) { out.push(r); continue; }
+    const customer = r.customer || "";
+    const rdd      = r.rdd || "";
+    const appt     = effective(r, "appt") || "";
+    const comment  = (EDITS[r.po] && EDITS[r.po].comment) || "";
+    const key = [customer, rdd, appt, comment].join("\u0000");
+    if (!otherGroups[key]) otherGroups[key] = { customer, rdd, appt, comment, members: [], proto: r };
+    otherGroups[key].members.push(r);
+  }
+
+  for (const k of Object.keys(otherGroups)) {
+    const g = otherGroups[k];
+    if (g.members.length === 1) { out.push(g.members[0]); continue; }
+    // Build master row for non-Target consolidation
+    const shipSet = new Set(g.members.map(m => effective(m, "ship") || ""));
+    const masterShip = shipSet.size === 1 ? [...shipSet][0] : "";
+    const apptLabel  = g.appt ? (", Appt " + g.appt) : ", no Appt";
+    const label = (g.customer || "") + " (" + g.members.length + " POs" + apptLabel + ")";
+    out.push({
+      po: label,
+      isMaster: true,
+      masterMiddle: null,            // signal: non-Target master
+      masterKey: k,                  // unique key for MASTER_EDITS lookup
+      members: g.members.map(m => m.po),
+      memberRows: g.members,
+      customer: g.customer,
+      status: g.proto.status,
+      dn: "",
+      sf: g.proto.sf,
+      rdd: g.rdd,
+      appt: g.appt,
+      ship: masterShip,
+      daysPast: g.proto.daysPast,
+      _hasAppt: !!g.appt,
+      _sharedComment: g.comment
+    });
+  }
+
+  // Final sort by Customer, then RDD, then PO
+  out.sort((a, b) => {
+    const cA = (a.customer || "").toLowerCase();
+    const cB = (b.customer || "").toLowerCase();
+    if (cA !== cB) return cA.localeCompare(cB);
+    const rA = a.rdd || "";
+    const rB = b.rdd || "";
+    if (rA !== rB) return rA.localeCompare(rB);
+    return (a.po || "").localeCompare(b.po || "");
+  });
+  return out;
+}
+
+function merged(row) {
+  if (row.isMaster) {
+    // Master comment resolution (does NOT mutate any stored data):
+    //   1) explicit MASTER_EDITS comment (typed on the master row)
+    //   2) shared comment across all member POs in EDITS
+    //   3) row._sharedComment from grouping
+    //   4) empty
+    let mc = (MASTER_EDITS[row.po] && MASTER_EDITS[row.po].comment) || "";
+    if (!mc && row.memberRows && row.memberRows.length) {
+      const memberComments = row.memberRows.map(m => (EDITS[m.po] && EDITS[m.po].comment) || "");
+      const allSame = memberComments.every(c => c === memberComments[0]);
+      if (allSame && memberComments[0]) mc = memberComments[0];
+    }
+    if (!mc && row._sharedComment) mc = row._sharedComment;
+    return {
+      ...row,
+      appt: row.appt,
+      ship: row.ship,
+      comment: mc
+    };
+  }
+  if (row._isSample) {
+    const e = SAMPLE_EDITS[row.orderName] || {};
+    return { ...row, comment: e.comment || "" };
+  }
+  const e = EDITS[row.po] || {};
+  return {
+    ...row,
+    appt: e.appt !== undefined ? e.appt : row.appt,
+    ship: e.ship !== undefined ? e.ship : row.ship,
+    comment: e.comment || ""
+  };
+}
+function isEdited(row, field) {
+  if (row.isMaster) {
+    if (field === "comment") {
+      if (MASTER_EDITS[row.po] && MASTER_EDITS[row.po].comment) return true;
+      // shared member comment counts as edited
+      if (row.memberRows && row.memberRows.some(m => EDITS[m.po] && EDITS[m.po].comment)) return true;
+      return false;
+    }
+    return row.members.some(p => EDITS[p] && EDITS[p][field] !== undefined);
+  }
+  if (row._isSample) {
+    return !!(SAMPLE_EDITS[row.orderName] && SAMPLE_EDITS[row.orderName][field] !== undefined);
+  }
+  return EDITS[row.po] && EDITS[row.po][field] !== undefined;
+}
+
+function statusColorClass(s) {
+  if (!s) return "status-unknown";
+  const u = String(s).toLowerCase();
+  if (u.includes("delivered"))   return "status-delivered";
+  if (u.includes("in transit"))  return "status-intransit";
+  if (u.includes("shipped"))     return "status-shipped";
+  if (u.includes("picked"))      return "status-picked";
+  if (u.includes("received"))    return "status-received";
+  if (u.includes("planned"))     return "status-planned";
+  if (u.includes("cancel"))      return "status-cancelled";
+  if (u.includes("open"))        return "status-open";
+  return "status-unknown";
+}
+function statusChip(s) {
+  if (!s) return '<span class="empty">&mdash;</span>';
+  return '<span class="status-chip ' + statusColorClass(s) + '" title="' + escapeHtml(s) + '">' + escapeHtml(s) + '</span>';
+}
+
+/* ---------- COMMERCIAL TABLE RENDER ---------- */
+function renderTable(tableId, rows, status) {
+  const tbody = document.querySelector("#" + tableId + " tbody");
+  tbody.innerHTML = rows.map(r => {
+    const m = merged(r);
+    const dpHtml = r.daysPast ? ' <span class="dp">(' + r.daysPast + 'd)</span>' : "";
+    const cIcon = m.comment ? '<span class="has-comment-icon">&#x270E;</span>' : "";
+    const cPreview = m.comment
+      ? '<span>' + escapeHtml(truncate(m.comment, 60)) + '</span>'
+      : '<span class="empty">&mdash;</span>';
+    const masterClass = r.isMaster ? " row-master" : "";
+    return '<tr class="row-data' + masterClass + '" data-po="' + escapeHtml(r.po) + '" data-status="' + status + '" data-kind="commercial">' +
+      '<td><b>' + escapeHtml(r.po) + '</b></td>' +
+      '<td>' + escapeHtml(r.customer) + '</td>' +
+      '<td class="col-status">' + emptyCell(r.dn) + '</td>' +
+      '<td>' + escapeHtml(r.sf) + '</td>' +
+      '<td>' + escapeHtml(r.rdd) + dpHtml + '</td>' +
+      '<td class="edit-cell ' + (isEdited(r,'appt')?'edited':'') + '" data-field="appt">' + emptyCell(m.appt) + '</td>' +
+      '<td class="edit-cell ' + (isEdited(r,'ship')?'edited':'') + '" data-field="ship">' + emptyCell(m.ship) + '</td>' +
+      '<td class="edit-cell col-comment ' + (isEdited(r,'comment')?'edited':'') + '" data-field="comment">' +
+        '<span class="comment-preview">' + cIcon + cPreview + '</span>' +
+      '</td>' +
+      '</tr>';
+  }).join("");
+}
+
+/* ---------- SAMPLES SLA EVALUATION ---------- */
+function evalSampleSla(s) {
+  const TODAY = "2026-06-04";
+  const createDate = s.created;
+  const createTime = s.createTime || "";
+  const shipDate   = s.shipDate || "";
+  const outStatus  = (s.outboundStatus || "").toUpperCase();
+
+  if (outStatus === "LEGACY") {
+    return { bucket: "g", sla: "N/A (legacy)", lateBy: 0, deadline: "", shipDate: s.shipDate || "", slaType: "N/A (legacy)",
+      reason: "Pre-2026 sample without Outbound match in current snapshot. Marked delivered in Samples sheet; excluded from OTD." };
+  }
+
+  if (outStatus === "CANCELLED") {
+    return { bucket: "g", sla: "Cancelled", lateBy: 0, deadline: "", shipDate: "", slaType: "N/A (cancelled)",
+      reason: "Outbound Col D = CANCELLED. Order voided before fulfillment; excluded from SLA grading." };
+  }
+
+  const tm = createTime.match(/^(\d{1,2}):(\d{2})$/);
+  const minutesFromMidnight = tm ? (parseInt(tm[1], 10) * 60 + parseInt(tm[2], 10)) : null;
+  const sameDay = (minutesFromMidnight !== null) && (minutesFromMidnight < 13 * 60);
+  const deadlineMs = Date.parse(createDate) + (sameDay ? 0 : 86400000);
+  const deadline   = new Date(deadlineMs).toISOString().slice(0, 10);
+  const slaType    = sameDay ? "Same-day (AT < 13:00)" : "Next-day (AT >= 13:00)";
+
+  if (shipDate) {
+    const lateBy = Math.round((Date.parse(shipDate) - deadlineMs) / 86400000);
+    if (lateBy <= 0) {
+      return { bucket: "g", sla: "Yes", lateBy: 0, deadline, shipDate, slaType,
+        reason: "Created " + createDate + " " + (createTime || "??:??") + " -> " + slaType + " window, deadline " + deadline + ". Shipped " + shipDate + " (in window)." };
+    }
+    return { bucket: "r", sla: "No", lateBy, deadline, shipDate, slaType,
+      reason: "Created " + createDate + " " + (createTime || "??:??") + " -> " + slaType + " window, deadline " + deadline + ". Shipped " + shipDate + " -> " + lateBy + " day(s) late." };
+  }
+
+  const lateVsToday = Math.round((Date.parse(TODAY) - deadlineMs) / 86400000);
+  if (lateVsToday > 0) {
+    return { bucket: "r", sla: "No", lateBy: lateVsToday, deadline, shipDate: "", slaType,
+      reason: "Created " + createDate + " " + (createTime || "??:??") + " -> deadline " + deadline + ". Not yet shipped; " + lateVsToday + " day(s) past deadline." };
+  }
+  return { bucket: "g", sla: "On Track", lateBy: 0, deadline, shipDate: "", slaType,
+    reason: "Created " + createDate + " " + (createTime || "??:??") + " -> deadline " + deadline + ". Pending outbound, still inside SLA window." };
+}
+
+function buildSamplesDisplay() {
+  const pending = [];
+  const shipped = [];
+  for (const s of SAMPLES_DATA) {
+    const sla = evalSampleSla(s);
+    const row = { ...s, _isSample: true, _sla: sla, po: s.orderName };
+    const isCancelled = (s.outboundStatus || "").toUpperCase() === "CANCELLED";
+    const isLegacy = (s.outboundStatus || "").toUpperCase() === "LEGACY";
+    if (s.shipDate || isCancelled || isLegacy) shipped.push(row);
+    else pending.push(row);
+  }
+  pending.sort((a,b) => a.created.localeCompare(b.created));
+  shipped.sort((a,b) => b.created.localeCompare(a.created));
+  return { pending, shipped };
+}
+
+function computeOtd() {
+  const currentMonthPrefix = "2026-06";   // today's date is 2026-06-03
+  let ytdShipped = 0, ytdOnTime = 0;
+  let mtdShipped = 0, mtdOnTime = 0;
+  for (const s of SAMPLES_DATA) {
+    const st = (s.outboundStatus || "").toUpperCase();
+    if (st === "CANCELLED" || st === "LEGACY") continue;
+    if (!s.shipDate) continue;
+    const sla = evalSampleSla(s);
+    const onTime = sla.sla === "Yes";
+    ytdShipped++;
+    if (onTime) ytdOnTime++;
+    if ((s.created || "").startsWith(currentMonthPrefix)) {
+      mtdShipped++;
+      if (onTime) mtdOnTime++;
+    }
+  }
+  const pct = (n, d) => d ? Math.round(n * 1000 / d) / 10 : null;
+  return {
+    ytdShipped, ytdOnTime, ytdPct: pct(ytdOnTime, ytdShipped),
+    mtdShipped, mtdOnTime, mtdPct: pct(mtdOnTime, mtdShipped)
+  };
+}
+
+function renderSampleTable(tableId, rows, bucket) {
+  const tbody = document.querySelector("#" + tableId + " tbody");
+  tbody.innerHTML = rows.map(r => {
+    const m = merged(r);
+    const cIcon = m.comment ? '<span class="has-comment-icon">&#x270E;</span>' : "";
+    const cPreview = m.comment
+      ? '<span>' + escapeHtml(truncate(m.comment, 60)) + '</span>'
+      : '<span class="empty">&mdash;</span>';
+    const slaCls = r._sla.bucket === "g" ? "g" : "r";
+    let slaLbl;
+    if (r._sla.sla === "Cancelled") slaLbl = "Cancelled";
+    else if (r._sla.sla === "N/A (legacy)") slaLbl = "N/A";
+    else if (r._sla.sla === "Yes") slaLbl = "Yes";
+    else if (r._sla.sla === "On Track") slaLbl = "On Track";
+    else slaLbl = "No" + (r._sla.lateBy > 0 ? " <span style=\"font-weight:600;\">(" + r._sla.lateBy + "d late)</span>" : "");
+    const isCancelled = r._sla.sla === "Cancelled";
+    // Show the raw Outbound Col D status value (with color mapping)
+    const rawStatus = (r.outboundStatus || "").toString().trim().toUpperCase();
+    const statusClassMap = {
+      "SHIPPED": "status-shipped",
+      "DELIVERED": "status-delivered",
+      "LEGACY_DELIVERED": "status-delivered",
+      "PLANNED": "status-planned",
+      "PICKED": "status-picked",
+      "RECEIVED": "status-received",
+      "IN_TRANSIT": "status-intransit",
+      "INTRANSIT": "status-intransit",
+      "SHORT_SHIPPED": "status-shipped",
+      "COMMIT_FAILED": "status-cancelled",
+      "CANCELLED": "status-cancelled",
+      "UNKNOWN": "status-unknown",
+      "": "status-unknown"
+    };
+    const stClass = statusClassMap[rawStatus] || "status-open";
+    const stLabel = rawStatus || "&mdash;";
+    const statusCellHtml = '<span class="status-chip ' + stClass + '" title="Outbound Col D">' + stLabel + '</span>';
+    const shipCell = r._sla.shipDate ? escapeHtml(r._sla.shipDate) : (isCancelled ? '<span class="empty">cancelled</span>' : '<span class="empty">&mdash;</span>');
+    const srcChip = (r.source === "Outbound")
+      ? '<span class="status-chip" style="background:#f0e6f7;color:#5a2768;" title="Outbound: Sample Ripvan">OB</span>'
+      : '<span class="status-chip" style="background:#e3edf7;color:#234868;" title="Samples Master (Shopify)">MS</span>';
+    const timeCell = r.createTime ? '<span style="font-family:ui-monospace,Menlo,Consolas,monospace; font-size:11px;">' + escapeHtml(r.createTime) + '</span>' : '<span class="empty">&mdash;</span>';
+    return '<tr class="row-data" data-po="' + escapeHtml(r.orderName) + '" data-status="' + bucket + '" data-kind="sample">' +
+      '<td>' + srcChip + '</td>' +
+      '<td><b>' + escapeHtml(r.orderName) + '</b></td>' +
+      '<td>' + escapeHtml(r.customer) + '</td>' +
+      '<td>' + escapeHtml(r.created) + '</td>' +
+      '<td>' + timeCell + '</td>' +
+      '<td>' + shipCell + '</td>' +
+      '<td class="col-status">' + statusCellHtml + '</td>' +
+      '<td><span class="sla-chip ' + slaCls + '">' + slaLbl + '</span></td>' +
+      '<td class="edit-cell col-comment ' + (isEdited(r,'comment')?'edited':'') + '" data-field="comment">' +
+        '<span class="comment-preview">' + cIcon + cPreview + '</span>' +
+      '</td>' +
+      '</tr>';
+  }).join("");
+}
+
+/* ---------- RECOMPUTE / RENDER ---------- */
+function recomputeDisplay() {
+  displayCache.red    = buildDisplayRows(DATA.red);
+  displayCache.yellow = buildDisplayRows(DATA.yellow);
+  displayCache.green  = buildDisplayRows(DATA.green);
+  sampleCache = buildSamplesDisplay();
+}
+
+function renderAll() {
+  recomputeDisplay();
+  document.getElementById("cntRed").textContent     = DATA.red.length;
+  document.getElementById("cntYellow").textContent  = DATA.yellow.length;
+  document.getElementById("cntGreen").textContent   = DATA.green.length;
+  document.getElementById("cntRedH").textContent    = DATA.red.length;
+  document.getElementById("cntYellowH").textContent = DATA.yellow.length;
+  document.getElementById("cntGreenH").textContent  = DATA.green.length;
+  document.getElementById("tabBadgeCommercial").textContent = (DATA.red.length + DATA.yellow.length + DATA.green.length);
+  renderTable("tblRed",    displayCache.red,    "red");
+  renderTable("tblYellow", displayCache.yellow, "yellow");
+  renderTable("tblGreen",  displayCache.green,  "green");
+  document.getElementById("cntPendingTop").textContent  = sampleCache.pending.length;
+  document.getElementById("cntShippedTop").textContent  = sampleCache.shipped.length;
+  document.getElementById("cntPendingH").textContent    = sampleCache.pending.length;
+  document.getElementById("cntShippedH").textContent    = sampleCache.shipped.length;
+  document.getElementById("tabBadgeSamples").textContent = SAMPLES_DATA.length;
+  renderSampleTable("tblSamplePending", sampleCache.pending, "samplepending");
+  renderSampleTable("tblSampleShipped", sampleCache.shipped, "sampleshipped");
+  const otd = computeOtd();
+  const fmtPct = v => (v === null || v === undefined) ? "&mdash;" : (v.toFixed(1) + "%");
+  const otdYtdEl = document.getElementById("otdYtdVal");
+  const otdMtdEl = document.getElementById("otdMtdVal");
+  otdYtdEl.innerHTML = fmtPct(otd.ytdPct);
+  otdMtdEl.innerHTML = fmtPct(otd.mtdPct);
+  const tone = v => (v === null) ? "" : (v >= 95 ? "" : (v >= 85 ? "mid" : "low"));
+  otdYtdEl.className = "otd-val " + tone(otd.ytdPct);
+  otdMtdEl.className = "otd-val " + tone(otd.mtdPct);
+  const ytdLate = otd.ytdShipped - otd.ytdOnTime;
+  const mtdLate = otd.mtdShipped - otd.mtdOnTime;
+  document.getElementById("otdYtdSub").textContent = ytdLate + " late / " + otd.ytdShipped + " shipped (cancelled & legacy excluded)";
+  document.getElementById("otdMtdSub").textContent = mtdLate + " late / " + otd.mtdShipped + " shipped this month";
+  document.getElementById("samplesAlertBody").innerHTML =
+    '<b>' + sampleCache.shipped.length + '</b> shipped (incl. cancelled / legacy) / <b>' + sampleCache.pending.length + '</b> pending outbound. ' +
+    'OTD YTD: <b>' + fmtPct(otd.ytdPct) + '</b> &middot; OTD MTD: <b>' + fmtPct(otd.mtdPct) + '</b>. ' +
+    'Evaluation uses Outbound Col D (status), AS (create date), AT (create time), AA (shipped time) joined to Samples Col E by SO #.';
+  if (activePo) {
+    document.querySelectorAll("tr.row-data").forEach(tr => tr.classList.toggle("active", tr.dataset.po === activePo));
+  }
+}
+
+/* ---------- TAB SWITCHING ---------- */
+function switchTab(tabName) {
+  activeTab = tabName;
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tabName));
+  document.querySelectorAll(".tab-pane").forEach(p => p.classList.toggle("active", p.id === "tab-" + tabName));
+}
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+});
+
+/* ---------- DRAWER ---------- */
+const drawer = document.getElementById("drawer");
+const drawerMask = document.getElementById("drawerMask");
+
+function findRow(po, kind) {
+  if (kind === "sample") {
+    for (const k of ["pending","shipped"]) {
+      const found = sampleCache[k].find(r => r.orderName === po);
+      if (found) return found;
+    }
+    const fallback = SAMPLES_DATA.find(s => s.orderName === po);
+    if (fallback) return { ...fallback, _isSample: true, _sla: evalSampleSla(fallback), po: fallback.orderName };
+    return null;
+  }
+  for (const k of ["red","yellow","green"]) {
+    const found = displayCache[k].find(r => r.po === po);
+    if (found) return found;
+  }
+  for (const k of ["red","yellow","green"]) {
+    const found = DATA[k].find(r => r.po === po);
+    if (found) return found;
+  }
+  return null;
+}
+
+function openDrawer(po, status, kind) {
+  const row = findRow(po, kind);
+  if (!row) return;
+  activePo = po; activeStatus = status;
+  const m = merged(row);
+  document.getElementById("dPo").textContent = row._isSample ? row.orderName : row.po;
+  const chip = document.getElementById("dStatus");
+  let chipColor = "g";
+  if (status === "red" || status === "samplepending") chipColor = "r";
+  else if (status === "yellow") chipColor = "y";
+  chip.textContent = (status || "").toUpperCase();
+  chip.className = "dchip " + chipColor;
+  const sg = document.getElementById("dStatusG");
+  if (row.status) {
+    sg.textContent = row.status;
+    sg.className = "status-chip " + statusColorClass(row.status);
+    sg.style.display = "inline-block";
+  } else { sg.style.display = "none"; }
+  document.getElementById("dCustomer").textContent = row.customer || "";
+
+  const masterBanner = document.getElementById("dMasterBanner");
+  const masterWrap   = document.getElementById("dMasterWrap");
+  const masterList   = document.getElementById("dMasterList");
+  const quickWrap    = document.getElementById("dQuickWrap");
+  const slaWrap      = document.getElementById("dSampleSlaWrap");
+
+  if (row._isSample) {
+    document.getElementById("dSfLbl").textContent = "Sales Rep";
+    document.getElementById("dSf").textContent = row.salesRep || "—";
+    document.getElementById("dRddLbl").textContent = "Order Created";
+    document.getElementById("dRdd").textContent = row.created;
+    masterBanner.style.display = "none";
+    masterWrap.style.display = "none";
+    quickWrap.style.display = "none";
+    slaWrap.style.display = "";
+    const sla = row._sla;
+    const slaCls = sla.bucket === "g" ? "g" : "r";
+    let slaLbl;
+    if (sla.sla === "Cancelled") slaLbl = "Cancelled";
+    else if (sla.sla === "N/A (legacy)") slaLbl = "N/A (legacy)";
+    else if (sla.sla === "Yes") slaLbl = "Yes";
+    else if (sla.sla === "On Track") slaLbl = "On Track (still in SLA window)";
+    else slaLbl = "No" + (sla.lateBy > 0 ? " (" + sla.lateBy + "d late)" : "");
+    const shipTxt = sla.shipDate || (sla.sla === "Cancelled" ? "cancelled" : "—");
+    document.getElementById("dSampleSlaDetail").innerHTML =
+      '<div style="margin-bottom:6px;"><span class="sla-chip ' + slaCls + '">' + slaLbl + '</span></div>' +
+      '<div style="color:#444; font-size:12px; line-height:1.6;">' +
+        '<div>Outbound Create (AS/AT): <b>' + escapeHtml(row.created || "—") + ' ' + escapeHtml(row.createTime || "") + '</b></div>' +
+        '<div>SLA window: <b>' + escapeHtml(sla.slaType || "") + '</b> &rarr; deadline <b>' + escapeHtml(sla.deadline) + '</b></div>' +
+        '<div>Ship date (Outbound Col AA): <b>' + escapeHtml(shipTxt) + '</b></div>' +
+        '<div style="margin-top:4px; color:#555;">' + escapeHtml(sla.reason) + '</div>' +
+      '</div>' +
+      '<div style="margin-top:8px; color:#888; font-size:11px;">Ship to: <b style="color:#1a1a1a;">' + escapeHtml(row.shipName || "") + '</b> &middot; ' + escapeHtml(row.shipCity || "") + ' &middot; Qty: <b style="color:#1a1a1a;">' + (row.qty || 0) + '</b></div>';
+  } else {
+    document.getElementById("dSfLbl").textContent = "Ship From (Col I)";
+    document.getElementById("dSf").textContent = row.sf || "—";
+    document.getElementById("dRddLbl").textContent = "RDD (Col E)";
+    document.getElementById("dRdd").textContent = (row.rdd || "") + (row.daysPast ? "  — " + row.daysPast + "d past" : "");
+    quickWrap.style.display = "";
+    slaWrap.style.display = "none";
+    if (row.isMaster) {
+      document.getElementById("dMasterN").textContent = row.members.length;
+      masterBanner.style.display = "";
+      masterList.innerHTML = (row.memberRows || row.members.map(p => ({po:p,dn:""}))).map(m => '<div class="ml-row">' + escapeHtml(m.po) + (m.dn ? ' <span style="color:#7a6a3a;font-size:11px;font-weight:600;">&mdash; ' + escapeHtml(m.dn) + '</span>' : '') + '</div>').join("");
+      masterWrap.style.display = "";
+    } else {
+      masterBanner.style.display = "none";
+      masterWrap.style.display = "none";
+    }
+    document.getElementById("dApptEl").value = m.appt || "";
+    document.getElementById("dShipEl").value = m.ship || "";
+  }
+  document.getElementById("dCommentEl").value = m.comment || "";
+  document.getElementById("saveHint").textContent = "";
+
+  drawer.classList.add("open"); drawer.setAttribute("aria-hidden", "false");
+  drawerMask.classList.add("open");
+  document.querySelectorAll("tr.row-data").forEach(tr => tr.classList.toggle("active", tr.dataset.po === po));
+}
+function closeDrawer() {
+  drawer.classList.remove("open"); drawer.setAttribute("aria-hidden", "true");
+  drawerMask.classList.remove("open");
+  document.querySelectorAll("tr.row-data").forEach(tr => tr.classList.remove("active"));
+  activePo = null;
+}
+
+function setMemberEdit(memberPo, field, value) {
+  let orig = null;
+  for (const k of ["red","yellow","green"]) {
+    const f = DATA[k].find(r => r.po === memberPo);
+    if (f) { orig = f; break; }
+  }
+  const origVal = orig ? (orig[field] || "") : "";
+  if (!EDITS[memberPo]) EDITS[memberPo] = {};
+  if (origVal === value) {
+    delete EDITS[memberPo][field];
+    if (Object.keys(EDITS[memberPo]).length === 0) delete EDITS[memberPo];
+  } else {
+    EDITS[memberPo][field] = value;
+  }
+}
+
+function saveEdit(po, field, value) {
+  const row = findRow(po, activeTab === "samples" ? "sample" : "commercial");
+  if (row && row._isSample) {
+    if (field !== "comment") return;
+    return saveComment(po, value);
+  }
+  if (row && row.isMaster) {
+    if (field === "comment") return saveComment(po, value);
+    for (const memberPo of row.members) setMemberEdit(memberPo, field, value);
+    activePo = null;
+    closeDrawer();
+    persist();
+    renderAll();
+    return;
+  }
+  setMemberEdit(po, field, value);
+  persist();
+  renderAll();
+}
+function saveComment(po, value) {
+  const row = findRow(po, activeTab === "samples" ? "sample" : "commercial");
+  if (row && row._isSample) {
+    if (!SAMPLE_EDITS[po]) SAMPLE_EDITS[po] = {};
+    if (!value) {
+      delete SAMPLE_EDITS[po].comment;
+      if (Object.keys(SAMPLE_EDITS[po]).length === 0) delete SAMPLE_EDITS[po];
+    } else {
+      SAMPLE_EDITS[po].comment = value;
+    }
+    persist();
+    renderAll();
+    return;
+  }
+  if (row && row.isMaster) {
+    if (!MASTER_EDITS[po]) MASTER_EDITS[po] = {};
+    if (!value) {
+      delete MASTER_EDITS[po].comment;
+      if (Object.keys(MASTER_EDITS[po]).filter(k => k !== 'comment').length === 0) delete MASTER_EDITS[po];
+    } else {
+      MASTER_EDITS[po].comment = value;
+    }
+    // Propagate to all member POs so they remain grouped under the shared comment.
+    // (Grouping key includes comment — different comments would split the group.)
+    if (row.members && row.members.length) {
+      for (const childPo of row.members) {
+        if (!EDITS[childPo]) EDITS[childPo] = {};
+        if (!value) {
+          delete EDITS[childPo].comment;
+          if (Object.keys(EDITS[childPo]).length === 0) delete EDITS[childPo];
+        } else {
+          EDITS[childPo].comment = value;
+        }
+      }
+    }
+    persist();
+    renderAll();
+    return;
+  }
+  if (!EDITS[po]) EDITS[po] = {};
+  if (!value) {
+    delete EDITS[po].comment;
+    if (Object.keys(EDITS[po]).length === 0) delete EDITS[po];
+  } else {
+    EDITS[po].comment = value;
+  }
+  persist();
+  renderAll();
+}
+
+document.addEventListener("dblclick", e => {
+  const cell = e.target.closest(".edit-cell");
+  if (!cell) return;
+  const tr = cell.closest("tr.row-data");
+  if (!tr) return;
+  if (cell.querySelector(".inline-input")) return;
+  e.stopPropagation();
+  const po = tr.dataset.po;
+  const kind = tr.dataset.kind;
+  const field = cell.dataset.field;
+  const row = findRow(po, kind);
+  if (!row) return;
+  const m = merged(row);
+  const current = m[field] || "";
+  const isComment = field === "comment";
+  const placeholder = isComment ? "Operational comment (carrier, ETA, owner, blocker)" : "YYYY-MM-DD";
+  const inputHtml = isComment
+    ? '<textarea class="inline-input" placeholder="' + placeholder + '">' + escapeHtml(current) + '</textarea>'
+    : '<input class="inline-input" type="text" value="' + escapeHtml(current) + '" placeholder="' + placeholder + '" />';
+  cell.innerHTML = inputHtml;
+  const input = cell.querySelector(isComment ? "textarea" : "input");
+  input.focus();
+  if (!isComment) input.select();
+  let committed = false;
+  function commit() {
+    if (committed) return; committed = true;
+    if (field === "comment") saveComment(po, input.value.trim());
+    else saveEdit(po, field, input.value.trim());
+  }
+  function cancel() { committed = true; renderAll(); }
+  input.addEventListener("blur", commit);
+  input.addEventListener("keydown", ev => {
+    if (ev.key === "Enter" && !ev.shiftKey && !isComment) { ev.preventDefault(); commit(); }
+    else if (ev.key === "Enter" && (ev.ctrlKey || ev.metaKey) && isComment) { ev.preventDefault(); commit(); }
+    else if (ev.key === "Escape") { ev.preventDefault(); input.removeEventListener("blur", commit); cancel(); }
+  });
+});
+
+document.addEventListener("click", e => {
+  if (e.target.closest(".inline-input")) return;
+  const tr = e.target.closest("tr.row-data");
+  if (tr) {
+    const editCell = e.target.closest(".edit-cell");
+    if (editCell && editCell.querySelector(".inline-input")) return;
+    openDrawer(tr.dataset.po, tr.dataset.status, tr.dataset.kind);
+  }
+});
+
+document.getElementById("drawerClose").addEventListener("click", closeDrawer);
+drawerMask.addEventListener("click", closeDrawer);
+document.addEventListener("keydown", e => { if (e.key === "Escape" && drawer.classList.contains("open")) closeDrawer(); });
+
+[["dApptEl","appt"],["dShipEl","ship"]].forEach(pair => {
+  const id = pair[0], field = pair[1];
+  document.getElementById(id).addEventListener("change", e => {
+    if (!activePo) return;
+    saveEdit(activePo, field, e.target.value.trim());
+    flashSaved();
+  });
+});
+let commentTimer = null;
+document.getElementById("dCommentEl").addEventListener("input", e => {
+  if (!activePo) return;
+  clearTimeout(commentTimer);
+  const val = e.target.value;
+  commentTimer = setTimeout(() => { saveComment(activePo, val.trim()); flashSaved(); }, 350);
+});
+function flashSaved() {
+  const h = document.getElementById("saveHint");
+  if (h) {
+    h.textContent = "✓ Saved locally — use Download CSV / Copy JSON to persist";
+    clearTimeout(flashSaved._t);
+    flashSaved._t = setTimeout(() => { h.textContent = ""; }, 2200);
+  }
+}
+
+/* ---------- EXPORT ---------- */
+function collectChanges() {
+  const rows = [];
+  for (const po of Object.keys(EDITS)) {
+    const e = EDITS[po];
+    const orig = (function(){
+      for (const k of ["red","yellow","green"]) {
+        const f = DATA[k].find(r => r.po === po);
+        if (f) return f;
+      }
+      return {};
+    })();
+    rows.push({
+      kind: "commercial", po: po, level: "individual", master_display_po: "",
+      customer: orig.customer || "", status: orig.status || "", sf: orig.sf || "", rdd: orig.rdd || "",
+      appt_original: orig.appt || "", appt_new: e.appt !== undefined ? e.appt : (orig.appt || ""),
+      ship_original: orig.ship || "", ship_new: e.ship !== undefined ? e.ship : (orig.ship || ""),
+      comment: e.comment || ""
+    });
+  }
+  for (const masterPo of Object.keys(MASTER_EDITS)) {
+    const e = MASTER_EDITS[masterPo];
+    if (!e.comment) continue;
+    rows.push({
+      kind: "commercial", po: "", level: "master", master_display_po: masterPo,
+      customer: "Target Corporation", status: "", sf: "UNIS", rdd: "",
+      appt_original: "", appt_new: "", ship_original: "", ship_new: "",
+      comment: e.comment || ""
+    });
+  }
+  for (const orderName of Object.keys(SAMPLE_EDITS)) {
+    const e = SAMPLE_EDITS[orderName];
+    if (!e.comment) continue;
+    const orig = SAMPLES_DATA.find(s => s.orderName === orderName) || {};
+    rows.push({
+      kind: "sample", po: orderName, level: "sample", master_display_po: "",
+      customer: orig.customer || "", status: orig.status || "", sf: orig.salesRep || "",
+      rdd: orig.created || "", appt_original: "", appt_new: "", ship_original: "", ship_new: "",
+      comment: e.comment || ""
+    });
+  }
+  return rows;
+}
+function toCsv(rows) {
+  const headers = ["kind","po","level","master_display_po","customer","status","sf","rdd","appt_original","appt_new","ship_original","ship_new","comment"];
+  const esc = v => { v = (v === null || v === undefined) ? "" : String(v); return /[,"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  return headers.join(",") + "\n" + rows.map(r => headers.map(h => esc(r[h])).join(",")).join("\n") + "\n";
+}
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove("show"), 1600);
+}
+document.getElementById("btnDownload").addEventListener("click", () => {
+  const rows = collectChanges();
+  const csv = toCsv(rows);
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const today = new Date().toISOString().slice(0,10);
+  a.href = url; a.download = "DDS_changes_v46_" + today + ".csv";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  showToast(rows.length ? "Downloaded " + rows.length + " change row(s)" : "No changes to download");
+});
+document.getElementById("btnCopyJson").addEventListener("click", async () => {
+  const payload = {
+    reportDate: "2026-06-04",
+    schemaVersion: "5.8",
+    source: {
+      master: "2026 RV Order Tracker (UNIS, non-cancelled)",
+      support: "Daily Outbound, folder 1HcZCjtU3HJaT2dapqZM_CLDXctdO8hRb (today: Outbound-Inquiry-Expanding(202606041007))",
+      samples: "Samples Master 1e03slsq6edovO2S-NwaKCc9SXWJOJ385XQCy5dPG0kA (Order Name = Col E)",
+      costcoSpg: "Pickup file 1L6F17... (today: Order tracking (17)) - no SPG/WG Pro overrides applied this cycle",
+      colMap: { rdd: "E", status: "G", po: "H", warehouse: "I (UNIS)", ship: "N", delivered: "O", outboundOrderStatus: "D", outboundAppt: "X", outboundCreateDate: "AS", outboundCreateTime: "AT", outboundShipTime: "AA", colM: "IGNORED" }
+    },
+    rules: {
+      red: "past RDD AND Col N empty",
+      yellow: "RDD next 7d AND (no Appt OR Appt < today AND Col N empty)",
+      green: "RDD next 7d AND (Appt >= today OR Col N populated OR Col O populated)",
+      samplesPending: "no shipDate in Outbound AND outboundStatus != CANCELLED",
+      samplesShipped: "has shipDate OR outboundStatus = CANCELLED",
+      samplesSlaYes: "shipDate <= deadline (same-day if AT<13:00 else next-day)",
+      samplesSlaNo: "shipDate > deadline OR not yet shipped past deadline",
+      samplesSlaCancelled: "outboundStatus = CANCELLED",
+      samplesSlaLegacy: "outboundStatus = LEGACY (pre-2026, no Outbound match, excluded from OTD)"
+    },
+    counts: {
+      commercial: { red: DATA.red.length, yellow: DATA.yellow.length, green: DATA.green.length },
+      samples: { pending: sampleCache.pending.length, shipped: sampleCache.shipped.length, total: SAMPLES_DATA.length }
+    },
+    executiveAlerts: {
+      pastDueResolved: ["577659-001 (Dot Foods, RDD 6/1 -> Ship/Deliv 6/3)"],
+      newRedToday: ["074298191 (UNFI, RDD 6/3)"],
+      samplesPendingCount: sampleCache.pending.length
+    },
+    display: {
+      red: displayCache.red.map(r => merged(r)),
+      yellow: displayCache.yellow.map(r => merged(r)),
+      green: displayCache.green.map(r => merged(r)),
+      samplesShipped: sampleCache.shipped.map(r => merged(r)),
+      samplesPending: sampleCache.pending.map(r => merged(r)),
+      otd: computeOtd()
+    },
+    rawData: { commercial: DATA, samples: SAMPLES_DATA },
+    edits: EDITS,
+    masterEdits: MASTER_EDITS,
+    sampleEdits: SAMPLE_EDITS
+  };
+  const json = JSON.stringify(payload, null, 2);
+  try {
+    await navigator.clipboard.writeText(json);
+    showToast("JSON copied to clipboard");
+  } catch (err) {
+    const ta = document.createElement("textarea");
+    ta.value = json; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); showToast("JSON copied to clipboard"); }
+    catch (e2) { showToast("Copy failed - see console"); console.log(json); }
+    document.body.removeChild(ta);
+  }
+});
+
+renderAll();
+</script>
+
+</body></html>
